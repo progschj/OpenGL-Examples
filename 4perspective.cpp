@@ -170,37 +170,37 @@ int main()
     // data for a cube
     GLfloat vertexData[] = {
     //  X     Y     Z           R     G     B
-	// face 0:
+    // face 0:
        1.0f, 1.0f, 1.0f,       1.0f, 0.0f, 0.0f, // vertex 0
       -1.0f, 1.0f, 1.0f,       1.0f, 0.0f, 0.0f, // vertex 1
        1.0f,-1.0f, 1.0f,       1.0f, 0.0f, 0.0f, // vertex 2
       -1.0f,-1.0f, 1.0f,       1.0f, 0.0f, 0.0f, // vertex 3
 
-	// face 1:
+    // face 1:
        1.0f, 1.0f, 1.0f,       0.0f, 1.0f, 0.0f, // vertex 0
        1.0f,-1.0f, 1.0f,       0.0f, 1.0f, 0.0f, // vertex 1
        1.0f, 1.0f,-1.0f,       0.0f, 1.0f, 0.0f, // vertex 2
        1.0f,-1.0f,-1.0f,       0.0f, 1.0f, 0.0f, // vertex 3
 
-	// face 2:
+    // face 2:
        1.0f, 1.0f, 1.0f,       0.0f, 0.0f, 1.0f, // vertex 0
        1.0f, 1.0f,-1.0f,       0.0f, 0.0f, 1.0f, // vertex 1
       -1.0f, 1.0f, 1.0f,       0.0f, 0.0f, 1.0f, // vertex 2
       -1.0f, 1.0f,-1.0f,       0.0f, 0.0f, 1.0f, // vertex 3
       
-	// face 3:
+    // face 3:
        1.0f, 1.0f,-1.0f,       1.0f, 1.0f, 0.0f, // vertex 0
        1.0f,-1.0f,-1.0f,       1.0f, 1.0f, 0.0f, // vertex 1
       -1.0f, 1.0f,-1.0f,       1.0f, 1.0f, 0.0f, // vertex 2
       -1.0f,-1.0f,-1.0f,       1.0f, 1.0f, 0.0f, // vertex 3
 
-	// face 4:
+    // face 4:
       -1.0f, 1.0f, 1.0f,       0.0f, 1.0f, 1.0f, // vertex 0
       -1.0f, 1.0f,-1.0f,       0.0f, 1.0f, 1.0f, // vertex 1
       -1.0f,-1.0f, 1.0f,       0.0f, 1.0f, 1.0f, // vertex 2
       -1.0f,-1.0f,-1.0f,       0.0f, 1.0f, 1.0f, // vertex 3
 
-	// face 5:
+    // face 5:
        1.0f,-1.0f, 1.0f,       1.0f, 0.0f, 1.0f, // vertex 0
       -1.0f,-1.0f, 1.0f,       1.0f, 0.0f, 1.0f, // vertex 1
        1.0f,-1.0f,-1.0f,       1.0f, 0.0f, 1.0f, // vertex 2
@@ -224,24 +224,24 @@ int main()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
             
     GLuint indexData[] = {
-		// face 0:
-        0,1,2, 		// first triangle
-        2,1,3, 		// second triangle
-		// face 1:
-        4,5,6, 		// first triangle
-        6,5,7, 		// second triangle
+        // face 0:
+        0,1,2,      // first triangle
+        2,1,3,      // second triangle
+        // face 1:
+        4,5,6,      // first triangle
+        6,5,7,      // second triangle
         // face 2:
-        8,9,10, 	// first triangle
-        10,9,11, 	// second triangle
+        8,9,10,     // first triangle
+        10,9,11,    // second triangle
         // face 3:
-        12,13,14, 	// first triangle
-        14,13,15, 	// second triangle
+        12,13,14,   // first triangle
+        14,13,15,   // second triangle
         // face 4:
-        16,17,18, 	// first triangle
-        18,17,19, 	// second triangle
+        16,17,18,   // first triangle
+        18,17,19,   // second triangle
         // face 5:
-        20,21,22, 	// first triangle
-        22,21,23, 	// second triangle
+        20,21,22,   // first triangle
+        22,21,23,   // second triangle
     };
 
     // fill with data
@@ -250,16 +250,16 @@ int main()
     // "unbind" vao
     glBindVertexArray(0);
 
-	
-	// we are drawing 3d objects so we want depth testing
-	glEnable(GL_DEPTH_TEST);
+    
+    // we are drawing 3d objects so we want depth testing
+    glEnable(GL_DEPTH_TEST);
 
     running = true;
     while(running)
     {   
-		// get the time in seconds
-		float t = glfwGetTime();
-		
+        // get the time in seconds
+        float t = glfwGetTime();
+        
         // terminate on excape 
         if(glfwGetKey(GLFW_KEY_ESC))
         {
@@ -274,12 +274,12 @@ int main()
         
         // calculate ViewProjection matrix
         glm::mat4 Projection = glm::perspective(90.0f, 4.0f / 3.0f, 0.1f, 100.f);
-		
-		// translate the world/view position
-		glm::mat4 View = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
-		
-		// make the camera rotate around the origin
-		View = glm::rotate(View, 90.0f*t, glm::vec3(1.0f, 1.0f, 1.0f)); 
+        
+        // translate the world/view position
+        glm::mat4 View = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
+        
+        // make the camera rotate around the origin
+        View = glm::rotate(View, 90.0f*t, glm::vec3(1.0f, 1.0f, 1.0f)); 
         
         glm::mat4 ViewProjection = Projection*View;
         

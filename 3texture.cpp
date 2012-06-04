@@ -209,14 +209,14 @@ int main()
     // create some image data
     std::vector<GLubyte> image(4*width*height);
     for(size_t j = 0;j<height;++j)
-		for(size_t i = 0;i<width;++i)
-		{
-			size_t index = j*width + i;
-			image[4*index + 0] = 0xFF*(j/10%2)*(i/10%2); // R
-			image[4*index + 1] = 0xFF*(j/13%2)*(i/13%2); // G
-			image[4*index + 2] = 0xFF*(j/17%2)*(i/17%2); // B
-			image[4*index + 3] = 0xFF;					 // A
-		}
+        for(size_t i = 0;i<width;++i)
+        {
+            size_t index = j*width + i;
+            image[4*index + 0] = 0xFF*(j/10%2)*(i/10%2); // R
+            image[4*index + 1] = 0xFF*(j/13%2)*(i/13%2); // G
+            image[4*index + 2] = 0xFF*(j/17%2)*(i/17%2); // B
+            image[4*index + 3] = 0xFF;                   // A
+        }
     
     // set texture content
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image[0]);
@@ -227,9 +227,9 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-	// "unbind" texture
-	glBindTexture(GL_TEXTURE_2D, 0);
-	
+    // "unbind" texture
+    glBindTexture(GL_TEXTURE_2D, 0);
+    
     running = true;
     while(running)
     {    
