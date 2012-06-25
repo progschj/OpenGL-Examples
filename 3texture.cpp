@@ -74,9 +74,10 @@ int main()
     glfwSetWindowCloseCallback(closedWindow);
     
     glewExperimental = GL_TRUE;
-    if (GLEW_OK != glewInit())
+    GLenum glew_error = glewInit();
+    if (glew_error != GLEW_OK)
     {
-        std::cerr << "failed to init GLEW" << std::endl;
+        std::cerr << "failed to init GLEW :" << glewGetErrorString(glew_error) << std::endl;
         glfwTerminate();
         return 1;
     }
