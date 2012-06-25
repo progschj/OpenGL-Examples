@@ -82,6 +82,7 @@ int main()
     if (GLEW_OK != glewInit())
     {
         std::cerr << "failed to init GLEW" << std::endl;
+        glfwTerminate();
         return 1;
     }
 
