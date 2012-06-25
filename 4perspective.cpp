@@ -82,7 +82,7 @@ int main()
     GLenum glew_error = glewInit();
     if (glew_error != GLEW_OK)
     {
-        std::cerr << "failed to init GLEW :" << glewGetErrorString(glew_error) << std::endl;
+        std::cerr << "failed to init GLEW: " << glewGetErrorString(glew_error) << std::endl;
         glfwTerminate();
         return 1;
     }
@@ -317,6 +317,7 @@ int main()
     glDeleteShader(vertex_shader);
     glDeleteShader(fragment_shader);
     glDeleteProgram(shader_program);
+    
     glfwTerminate();
     return 0;
 }

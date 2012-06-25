@@ -64,7 +64,7 @@ int main()
 
     // sadly glew doesn't play nice with core profiles... 
     glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
-    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3);
+    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 7);
     glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 3);
  
     // create a window
@@ -77,7 +77,7 @@ int main()
     GLenum glew_error = glewInit();
     if (glew_error != GLEW_OK)
     {
-        std::cerr << "failed to init GLEW :" << glewGetErrorString(glew_error) << std::endl;
+        std::cerr << "failed to init GLEW: " << glewGetErrorString(glew_error) << std::endl;
         glfwTerminate();
         return 1;
     }
