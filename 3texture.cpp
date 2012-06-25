@@ -270,6 +270,20 @@ int main()
         // finally swap buffers
         glfwSwapBuffers();       
     }
+    
+    // delete the created objects
+    
+    glDeleteTextures(1, &texture);
+    
+    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &vbo);
+    glDeleteBuffers(1, &ibo);
+    
+    glDetachShader(shader_program, vertex_shader);	
+    glDetachShader(shader_program, fragment_shader);
+    glDeleteShader(vertex_shader);
+    glDeleteShader(fragment_shader);
+    glDeleteProgram(shader_program);
 
     glfwTerminate();
     return 0;
