@@ -1,6 +1,7 @@
 /* OpenGL example code - Instancing
  * 
  * create 8 instances of the cube from the perspective example
+ * with an additional offset buffer and AttribDivisor
  * 
  * Autor: Jakob Progsch
  */
@@ -92,7 +93,7 @@ int main()
         "uniform mat4 ViewProjection;\n" // the projection matrix uniform
         "in vec4 vposition;\n"
         "in vec4 vcolor;\n"
-        "in vec3 voffset;\n"
+        "in vec3 voffset;\n" // the per instance offset
         "out vec4 fcolor;\n"
         "void main() {\n"
         "   fcolor = vcolor;\n"
