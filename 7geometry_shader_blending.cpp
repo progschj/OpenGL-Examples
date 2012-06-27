@@ -223,9 +223,12 @@ int main()
         vertexData[3*i+1] = 0;
         vertexData[3*i+2] = r*std::cos(alpha);
         
-        vertexData[3*i+0] += (4.0f-0.2*alpha)*(2-(std::rand()/float(RAND_MAX)+std::rand()/float(RAND_MAX)+std::rand()/float(RAND_MAX)+std::rand()/float(RAND_MAX)));
-        vertexData[3*i+1] += (2.0f-0.1*alpha)*(2-(std::rand()/float(RAND_MAX)+std::rand()/float(RAND_MAX)+std::rand()/float(RAND_MAX)+std::rand()/float(RAND_MAX)));
-        vertexData[3*i+2] += (4.0f-0.2*alpha)*(2-(std::rand()/float(RAND_MAX)+std::rand()/float(RAND_MAX)+std::rand()/float(RAND_MAX)+std::rand()/float(RAND_MAX)));
+        vertexData[3*i+0] += (4.0f-0.2*alpha)*(2-(std::rand()/float(RAND_MAX)+std::rand()/float(RAND_MAX)+
+                                                  std::rand()/float(RAND_MAX)+std::rand()/float(RAND_MAX)));
+        vertexData[3*i+1] += (2.0f-0.1*alpha)*(2-(std::rand()/float(RAND_MAX)+std::rand()/float(RAND_MAX)+
+                                                  std::rand()/float(RAND_MAX)+std::rand()/float(RAND_MAX)));
+        vertexData[3*i+2] += (4.0f-0.2*alpha)*(2-(std::rand()/float(RAND_MAX)+std::rand()/float(RAND_MAX)+
+                                                  std::rand()/float(RAND_MAX)+std::rand()/float(RAND_MAX)));
     }
 
     // fill with data
