@@ -1,6 +1,7 @@
 /* OpenGL example code - Perspective
  * 
- * set up a perspective projection and render a rotating cube
+ * create 8 instances of the cube from the perspective example
+ * the per instance data is passed with a uniform buffer object
  * 
  * Autor: Jakob Progsch
  */
