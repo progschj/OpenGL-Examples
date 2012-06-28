@@ -228,9 +228,6 @@ int main()
     
     // set texture content
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image[0]);
-
-    // "unbind" texture
-    glBindTexture(GL_TEXTURE_2D, 0);
     
     running = true;
     while(running)

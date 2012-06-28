@@ -101,7 +101,7 @@ int main()
         // access the buffer texture with the InstanceID (tbo[InstanceID])
         "   vec4 offset = texelFetch(offset_texture, gl_InstanceID);\n" 
         "   fcolor = vcolor;\n"
-        "   gl_Position = ViewProjection*(vposition + vec4(offset.xyz, 0));\n"
+        "   gl_Position = ViewProjection*(vposition + offset);\n"
         "}\n";
         
     std::string fragment_source =
@@ -227,8 +227,6 @@ int main()
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (char*)0 + 3*sizeof(GLfloat));
  
     
-    
-    
     // generate and bind the index buffer object
     glGenBuffers(1, &ibo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
@@ -268,18 +266,18 @@ int main()
             
     // the offsets
     GLfloat translationData[] = {
-                 2.0f, 2.0f, 2.0f,  // cube 0
-                 2.0f, 2.0f,-2.0f,  // cube 1
-                 2.0f,-2.0f, 2.0f,  // cube 2
-                 2.0f,-2.0f,-2.0f,  // cube 3
-                -2.0f, 2.0f, 2.0f,  // cube 4
-                -2.0f, 2.0f,-2.0f,  // cube 5
-                -2.0f,-2.0f, 2.0f,  // cube 6
-                -2.0f,-2.0f,-2.0f,  // cube 7
+                 2.0f, 2.0f, 2.0f, 0.0f,  // cube 0
+                 2.0f, 2.0f,-2.0f, 0.0f,  // cube 1
+                 2.0f,-2.0f, 2.0f, 0.0f,  // cube 2
+                 2.0f,-2.0f,-2.0f, 0.0f,  // cube 3
+                -2.0f, 2.0f, 2.0f, 0.0f,  // cube 4
+                -2.0f, 2.0f,-2.0f, 0.0f,  // cube 5
+                -2.0f,-2.0f, 2.0f, 0.0f,  // cube 6
+                -2.0f,-2.0f,-2.0f, 0.0f,  // cube 7
     }; // 8 offsets with 3 components each
  
     // fill with data
-    glBufferData(GL_TEXTURE_BUFFER, sizeof(GLfloat)*3*8, translationData, GL_STATIC_DRAW);
+    glBufferData(GL_TEXTURE_BUFFER, sizeof(GLfloat)*4*8, translationData, GL_STATIC_DRAW);
 
     // texture handle
     GLuint buffer_texture;
@@ -289,10 +287,8 @@ int main()
     glBindTexture(GL_TEXTURE_BUFFER, buffer_texture);
     
     // tell the buffer texture to use 
-    glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, tbo);
+    glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, tbo);
     
-    // "unbind" texture
-    glBindTexture(GL_TEXTURE_BUFFER, 0);
     
     // we are drawing 3d objects so we want depth testing
     glEnable(GL_DEPTH_TEST);

@@ -309,6 +309,7 @@ int main()
     glDeleteBuffers(1, &vbo);
     
     glDetachShader(shader_program, vertex_shader);	
+    glDetachShader(shader_program, geometry_shader);	
     glDetachShader(shader_program, fragment_shader);
     glDeleteShader(vertex_shader);
     glDeleteShader(geometry_shader);
