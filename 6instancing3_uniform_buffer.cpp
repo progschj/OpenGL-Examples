@@ -1,4 +1,4 @@
-/* OpenGL example code - Perspective
+/* OpenGL example code - Instancing with uniform buffer object
  * 
  * create 8 instances of the cube from the perspective example
  * the per instance data is passed with a uniform buffer object
