@@ -136,14 +136,7 @@ int main()
     // attach shaders
     glAttachShader(shader_program, vertex_shader);
     glAttachShader(shader_program, fragment_shader);
-     /*   
-    // bind the attribute locations (inputs)
-    glBindAttribLocation(shader_program, 0, "vposition");
-    glBindAttribLocation(shader_program, 1, "vcolor");
-    
-    // bind the FragDataLocation (output)
-    glBindFragDataLocation(shader_program, 0, "FragColor");
-    */
+
     // link the program and check for errors
     glLinkProgram(shader_program);
     check_program_link_status(shader_program);
