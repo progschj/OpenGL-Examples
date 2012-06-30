@@ -1,6 +1,8 @@
 /* OpenGL example code - Shader and VBO
  * 
  * This example shows the setup and usage of shaders and a vbo+vao
+ * In this example the attrbute locations are set via BindAttribLocation
+ * instead of layout qualifiers in the shaders
  * 
  * Autor: Jakob Progsch
  */

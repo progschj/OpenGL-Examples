@@ -95,7 +95,7 @@ int main()
     // the vertex shader simply passes through data
     std::string vertex_source =
         "#version 330\n"
-        "in vec4 vposition;\n"
+        "layout(location = 0) in vec4 vposition;\n"
         "void main() {\n"
         "   gl_Position = vposition;\n"
         "}\n";
@@ -128,7 +128,7 @@ int main()
     std::string fragment_source =
         "#version 330\n"
         "in vec2 txcoord;\n"
-        "out vec4 FragColor;\n"
+        "layout(location = 0) out vec4 FragColor;\n"
         "void main() {\n"
         "   float s = 0.2*(1/(1+15.*dot(txcoord, txcoord))-1/16.);\n"
         "   FragColor = s*vec4(1,0.9,0.6,1);\n"
@@ -181,12 +181,6 @@ int main()
     glAttachShader(shader_program, vertex_shader);
     glAttachShader(shader_program, geometry_shader);
     glAttachShader(shader_program, fragment_shader);
-        
-    // bind the attribute locations (inputs)
-    glBindAttribLocation(shader_program, 0, "vposition");
-    
-    // bind the FragDataLocation (output)
-    glBindFragDataLocation(shader_program, 0, "FragColor");
     
     // link the program and check for errors
     glLinkProgram(shader_program);

@@ -92,8 +92,8 @@ int main()
     std::string vertex_source =
         "#version 330\n"
         "uniform mat4 ViewProjection;\n" // the projection matrix uniform
-        "in vec4 vposition;\n"
-        "in vec4 vcolor;\n"
+        "layout(location = 0) in vec4 vposition;\n"
+        "layout(location = 1) in vec4 vcolor;\n"
         "out vec4 fcolor;\n"
         "void main() {\n"
         "   fcolor = vcolor;\n"
@@ -103,7 +103,7 @@ int main()
     std::string fragment_source =
         "#version 330\n"
         "in vec4 fcolor;\n"
-        "out vec4 FragColor;\n"
+        "layout(location = 0) out vec4 FragColor;\n"
         "void main() {\n"
         "   FragColor = fcolor;\n"
         // the following line is required for fxaa (will not work with blending!)
@@ -146,13 +146,6 @@ int main()
     // attach shaders
     glAttachShader(shader_program, vertex_shader);
     glAttachShader(shader_program, fragment_shader);
-        
-    // bind the attribute locations (inputs)
-    glBindAttribLocation(shader_program, 0, "vposition");
-    glBindAttribLocation(shader_program, 1, "vcolor");
-    
-    // bind the FragDataLocation (output)
-    glBindFragDataLocation(shader_program, 0, "FragColor");
     
     // link the program and check for errors
     glLinkProgram(shader_program);
@@ -260,8 +253,8 @@ int main()
     // shader source code
     std::string post_effect_vertex_source =
         "#version 330\n"
-        "in vec4 vposition;\n"
-        "in vec2 vtexcoord;\n"
+        "layout(location = 0) in vec4 vposition;\n"
+        "layout(location = 1) in vec2 vtexcoord;\n"
         "out vec2 ftexcoord;\n"
         "void main() {\n"
         "   ftexcoord = vtexcoord;\n"
@@ -283,7 +276,7 @@ int main()
         "#version 330\n"
         "uniform sampler2D texture;\n"
         "in vec2 ftexcoord;\n"
-        "out vec4 FragColor;\n"
+        "layout(location = 0) out vec4 FragColor;\n"
         "\n"
         "float FxaaLuma(vec4 rgba) {\n"
         "    return rgba.w;\n"
@@ -510,13 +503,6 @@ int main()
     // attach shaders
     glAttachShader(post_effect_shader_program, post_effect_vertex_shader);
     glAttachShader(post_effect_shader_program, post_effect_fragment_shader);
-        
-    // bind the attribute locations (inputs)
-    glBindAttribLocation(post_effect_shader_program, 0, "vposition");
-    glBindAttribLocation(post_effect_shader_program, 1, "vtexcoord");
-    
-    // bind the FragDataLocation (output)
-    glBindFragDataLocation(post_effect_shader_program, 0, "FragColor");
     
     // link the program and check for errors
     glLinkProgram(post_effect_shader_program);

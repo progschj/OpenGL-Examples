@@ -95,8 +95,8 @@ int main()
         "   mat4 ViewProjection;\n"
         "   mat4 Model[8];\n"
         "};\n"
-        "in vec4 vposition;\n"
-        "in vec4 vcolor;\n"
+        "layout(location = 0) in vec4 vposition;\n"
+        "layout(location = 1) in vec4 vcolor;\n"
         "out vec4 fcolor;\n"
         "void main() {\n"
         "   fcolor = vcolor;\n"
@@ -106,7 +106,7 @@ int main()
     std::string fragment_source =
         "#version 330\n"
         "in vec4 fcolor;\n"
-        "out vec4 FragColor;\n"
+        "layout(location = 0) out vec4 FragColor;\n"
         "void main() {\n"
         "   FragColor = fcolor;\n"
         "}\n";
@@ -146,13 +146,6 @@ int main()
     // attach shaders
     glAttachShader(shader_program, vertex_shader);
     glAttachShader(shader_program, fragment_shader);
-        
-    // bind the attribute locations (inputs)
-    glBindAttribLocation(shader_program, 0, "vposition");
-    glBindAttribLocation(shader_program, 1, "vcolor");
-    
-    // bind the FragDataLocation (output)
-    glBindFragDataLocation(shader_program, 0, "FragColor");
     
     // link the program and check for errors
     glLinkProgram(shader_program);
