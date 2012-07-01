@@ -6,6 +6,14 @@
  * 
  * Autor: Jakob Progsch
  */
+ 
+/* index
+ * line   95: shader sources
+ * line  114: shader compilation   
+ * line  150: attribute and frag data binding        
+ * line  161: vbo creation    
+ * line  216: draw call       
+ */
 
 #include <GL/glew.h>
 #include <GL/glfw.h>
@@ -102,7 +110,7 @@ int main()
         "void main() {\n"
         "   FragColor = fcolor;\n"
         "}\n";
-   
+
     // program and shader handles
     GLuint shader_program, vertex_shader, fragment_shader;
     
@@ -138,7 +146,7 @@ int main()
     // attach shaders
     glAttachShader(shader_program, vertex_shader);
     glAttachShader(shader_program, fragment_shader);
-        
+
     // bind the attribute locations (inputs)
     glBindAttribLocation(shader_program, 0, "vposition");
     glBindAttribLocation(shader_program, 1, "vcolor");
@@ -149,7 +157,6 @@ int main()
     // link the program and check for errors
     glLinkProgram(shader_program);
     check_program_link_status(shader_program);
-    
     
     // vao and vbo handle
     GLuint vao, vbo;
@@ -205,7 +212,7 @@ int main()
         
         // bind the vao
         glBindVertexArray(vao);
-       
+
         // draw
         glDrawArrays(GL_TRIANGLES, 0, 6);
        
@@ -235,3 +242,4 @@ int main()
     glfwTerminate();
     return 0;
 }
+

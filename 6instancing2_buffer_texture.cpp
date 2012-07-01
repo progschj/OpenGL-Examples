@@ -7,6 +7,14 @@
  * 
  * Autor: Jakob Progsch
  */
+ 
+/* index
+ * line  109: buffer texture access in shader
+ * line  263: buffer texture setup    
+ * line  327: buffer texture binding       
+ * line  343: draw call       
+ */
+ 
 #include <GL/glew.h>
 #include <GL/glfw.h>
  
@@ -251,7 +259,7 @@ int main()
     // "unbind" vao
     glBindVertexArray(0);
     
-    
+
     // generate and bind the buffer object containing the
     // instance offsets
     glGenBuffers(1, &tbo);
@@ -315,7 +323,7 @@ int main()
         View = glm::rotate(View, 90.0f*t, glm::vec3(1.0f, 1.0f, 1.0f)); 
         
         glm::mat4 ViewProjection = Projection*View;
-       
+
         // bind texture to texture unit 0
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_BUFFER, buffer_texture);
@@ -331,7 +339,7 @@ int main()
         // bind the vao
         glBindVertexArray(vao);
 
-       
+
         // draw
         // the additional parameter indicates how many instances to render
         glDrawElementsInstanced(GL_TRIANGLES, 6*6, GL_UNSIGNED_INT, 0, 8);
@@ -366,3 +374,4 @@ int main()
     glfwTerminate();
     return 0;
 }
+

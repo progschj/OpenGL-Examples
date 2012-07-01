@@ -5,6 +5,11 @@
  * Autor: Jakob Progsch
  */
 
+/* index
+ * line  182: index buffer creation    
+ * line  215: draw call       
+ */
+
 #include <GL/glew.h>
 #include <GL/glfw.h>
 
@@ -141,7 +146,7 @@ int main()
     glLinkProgram(shader_program);
     check_program_link_status(shader_program);
     
-    
+ //$entry vbo creation   
     // vao and vbo handle
     GLuint vao, vbo, ibo;
  
@@ -173,7 +178,7 @@ int main()
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (char*)0 + 3*sizeof(GLfloat));
     
-    
+
     // generate and bind the index buffer object
     glGenBuffers(1, &ibo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
@@ -206,7 +211,7 @@ int main()
         
         // bind the vao
         glBindVertexArray(vao);
-       
+
         // draw
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
        
@@ -237,3 +242,4 @@ int main()
     glfwTerminate();
     return 0;
 }
+

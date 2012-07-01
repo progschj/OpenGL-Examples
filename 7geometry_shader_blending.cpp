@@ -7,6 +7,12 @@
  * Autor: Jakob Progsch
  */
 
+/* index
+ * line  109: geometry shader source    
+ * line  213: creation of galaxy distribution            
+ * line  291: draw call       
+ */
+
 #include <GL/glew.h>
 #include <GL/glfw.h>
 
@@ -99,7 +105,7 @@ int main()
         "void main() {\n"
         "   gl_Position = vposition;\n"
         "}\n";
-    
+
     // the geometry shader creates the billboard quads
     std::string geometry_source =
         "#version 330\n"
@@ -203,7 +209,7 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     
     const int particles = 128*1024;
-            
+
     // create a galaxylike distribution of points
     std::vector<GLfloat> vertexData(particles*3);
     for(int i = 0;i<particles;++i)
@@ -281,7 +287,7 @@ int main()
         
         // bind the vao
         glBindVertexArray(vao);
-       
+
         // draw
         glDrawArrays(GL_POINTS, 0, particles);
        
@@ -313,3 +319,4 @@ int main()
     glfwTerminate();
     return 0;
 }
+

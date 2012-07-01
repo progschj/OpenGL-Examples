@@ -5,6 +5,13 @@
  * Autor: Jakob Progsch
  */
 
+/* index
+ * line  100: matrix uniform in shader
+ * line  106: matrix transform in shader
+ * line  277: projection matrix creation
+ * line  291: draw call        
+ */
+
 #include <GL/glew.h>
 #include <GL/glfw.h>
 
@@ -266,7 +273,7 @@ int main()
         
         // use the shader program
         glUseProgram(shader_program);
-        
+
         // calculate ViewProjection matrix
         glm::mat4 Projection = glm::perspective(90.0f, 4.0f / 3.0f, 0.1f, 100.f);
         
@@ -280,7 +287,7 @@ int main()
         
         // set the uniform
         glUniformMatrix4fv(ViewProjection_location, 1, GL_FALSE, glm::value_ptr(ViewProjection)); 
-        
+
         // bind the vao
         glBindVertexArray(vao);
        
@@ -314,3 +321,4 @@ int main()
     glfwTerminate();
     return 0;
 }
+

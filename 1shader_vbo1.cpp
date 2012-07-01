@@ -4,6 +4,13 @@
  * 
  * Autor: Jakob Progsch
  */
+ 
+/* index
+ * line   92: shader sources
+ * line  111: shader compilation   
+ * line  152: vbo creation    
+ * line  207: draw call       
+ */
 
 #include <GL/glew.h>
 #include <GL/glfw.h>
@@ -86,7 +93,7 @@ int main()
     std::string vertex_source =
         "#version 330\n"
         "layout(location = 0) in vec4 vposition;\n"
-        "layout(location = 1)in vec4 vcolor;\n"
+        "layout(location = 1) in vec4 vcolor;\n"
         "out vec4 fcolor;\n"
         "void main() {\n"
         "   fcolor = vcolor;\n"
@@ -100,7 +107,7 @@ int main()
         "void main() {\n"
         "   FragColor = fcolor;\n"
         "}\n";
-   
+
     // program and shader handles
     GLuint shader_program, vertex_shader, fragment_shader;
     
@@ -141,7 +148,7 @@ int main()
     glLinkProgram(shader_program);
     check_program_link_status(shader_program);
     
-    
+
     // vao and vbo handle
     GLuint vao, vbo;
  
@@ -196,7 +203,7 @@ int main()
         
         // bind the vao
         glBindVertexArray(vao);
-       
+
         // draw
         glDrawArrays(GL_TRIANGLES, 0, 6);
        
@@ -226,3 +233,4 @@ int main()
     glfwTerminate();
     return 0;
 }
+

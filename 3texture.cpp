@@ -5,6 +5,13 @@
  * Autor: Jakob Progsch
  */
 
+/* index
+ * line  109: texture access in shader
+ * line  202: texture creation    
+ * line  247: texture binding        
+ * line  257: draw call
+ */
+
 #include <GL/glew.h>
 #include <GL/glfw.h>
 
@@ -191,7 +198,7 @@ int main()
     
     // "unbind" vao
     glBindVertexArray(0);
-    
+
     // texture handle
     GLuint texture;
     
@@ -236,7 +243,7 @@ int main()
         
         // use the shader program
         glUseProgram(shader_program);
-        
+
         // bind texture to texture unit 0
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
@@ -246,7 +253,7 @@ int main()
         
         // bind the vao
         glBindVertexArray(vao);
-       
+        
         // draw
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
        
@@ -279,3 +286,4 @@ int main()
     glfwTerminate();
     return 0;
 }
+

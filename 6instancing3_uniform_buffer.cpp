@@ -6,6 +6,13 @@
  * Autor: Jakob Progsch
  */
 
+/* index
+ * line  101: uniform block in shader
+ * line  161: setup uniform block binding and uniform buffer    
+ * line  317: bind uniform block for drawing        
+ * line  322: draw call       
+ */
+
 #include <GL/glew.h>
 #include <GL/glfw.h>
 
@@ -150,7 +157,7 @@ int main()
     // link the program and check for errors
     glLinkProgram(shader_program);
     check_program_link_status(shader_program);
-    
+
     // obtain location of the uniform block
     GLuint Matrices_binding = 0;
     GLint uniform_block_index = glGetUniformBlockIndex(shader_program, "Matrices");
@@ -311,7 +318,7 @@ int main()
         
         // bind the vao
         glBindVertexArray(vao);
-       
+
         // draw
         // the additional parameter indicates how many instances to render
         glDrawElementsInstanced(GL_TRIANGLES, 6*6, GL_UNSIGNED_INT, 0, 8);
@@ -343,3 +350,4 @@ int main()
     glfwTerminate();
     return 0;
 }
+

@@ -5,6 +5,12 @@
  * 
  * Autor: Jakob Progsch
  */
+ 
+/* index
+ * line  255: translation buffer setup
+ * line  326: draw call
+ */
+ 
 #include <GL/glew.h>
 #include <GL/glfw.h>
  
@@ -245,9 +251,7 @@ int main()
     // fill with data
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*6*2*3, indexData, GL_STATIC_DRAW);
     
-    
-    
-    
+
     // generate and bind the vertex buffer object containing the
     // instance offsets
     glGenBuffers(1, &tbo);
@@ -318,7 +322,7 @@ int main()
         
         // bind the vao
         glBindVertexArray(vao);
-       
+
         // draw
         // the additional parameter indicates how many instances to render
         glDrawElementsInstanced(GL_TRIANGLES, 6*6, GL_UNSIGNED_INT, 0, 8);
@@ -351,3 +355,4 @@ int main()
     glfwTerminate();
     return 0;
 }
+

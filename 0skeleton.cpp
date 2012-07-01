@@ -4,6 +4,13 @@
  * 
  * Autor: Jakob Progsch
  */
+ 
+/* index
+ * line   34: glfw initialization
+ * line   47: glew initialization    
+ * line   58: main loop    
+ * line   82: cleanup
+ */
 
 #include <GL/glew.h>
 #include <GL/glfw.h>
@@ -36,7 +43,7 @@ int main()
     
     // setup windows close callback
     glfwSetWindowCloseCallback(closedWindow);
-    
+
     glewExperimental = GL_TRUE;
     GLenum glew_error = glewInit();
     if (glew_error != GLEW_OK)
@@ -47,7 +54,7 @@ int main()
     }
     
     // creation and initialization of stuff goes here
-    
+
     running = true;
     while(running)
     {    
@@ -75,3 +82,4 @@ int main()
     glfwTerminate();
     return 0;
 }
+

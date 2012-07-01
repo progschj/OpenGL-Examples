@@ -6,6 +6,16 @@
  * Autor: Jakob Progsch
  */
 
+/* index
+ * line  262: fxaa shader
+ * line  570: target texture setup    
+ * line  589: render buffer setup
+ * line  598: fbo setup 
+ * line  635: fbo binding
+ * line  662: scene draw call       
+ * line  687: post processing draw call           
+ */
+
 #include <GL/glew.h>
 #include <GL/glfw.h>
 
@@ -249,7 +259,6 @@ int main()
     // "unbind" vao
     glBindVertexArray(0);
 	
-
     // shader source code
     std::string post_effect_vertex_source =
         "#version 330\n"
@@ -558,9 +567,6 @@ int main()
     // "unbind" vao
     glBindVertexArray(0);
     
-    
-    
- 
     // texture handle
     GLuint texture;
     
@@ -588,7 +594,7 @@ int main()
        
     glBindRenderbuffer(GL_RENDERBUFFER, rbf);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
- 
+
     // framebuffer handle
     GLuint fbo;
         
@@ -652,7 +658,7 @@ int main()
         
         // bind the vao
         glBindVertexArray(vao);
-       
+
         // draw
         glDrawElements(GL_TRIANGLES, 6*6, GL_UNSIGNED_INT, 0);
         
@@ -677,7 +683,7 @@ int main()
             
             // bind the vao
             glBindVertexArray(post_effect_vao);
-           
+
             // draw
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         }            
@@ -719,3 +725,4 @@ int main()
     glfwTerminate();
     return 0;
 }
+
