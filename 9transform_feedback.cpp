@@ -1,4 +1,4 @@
-/* OpenGL example code - buffer mapping
+/* OpenGL example code - transform feedback
  * 
  * This example simulates the same particle system as the buffer mapping
  * example. Instead of updating particles on the cpu and uploading
