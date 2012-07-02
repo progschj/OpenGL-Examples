@@ -1,17 +1,17 @@
 /* OpenGL example code - buffer mapping
  * 
- * This example uses the geometry shader again for particle drawing.
- * The particles are animated on the cpu and uploaded every frame by
- * mapping vbos. Multiple vbos are used to triple buffer the particle
- * data.
+ * This example simulates the same particle system as the buffer mapping
+ * example. Instead of updating particles on the cpu and uploading
+ * the update is done on the gpu with transform feedback.
  * 
  * Autor: Jakob Progsch
  */
 
 /* index
- * line  205: initialize particles            
- * line  310: vbo mapping
- * line  349: draw call       
+ * line  203: transform feedback shader source code
+ * line  281: initialize particles            
+ * line  361: transform feedback physics update        
+ * line  410: draw call       
  */
 
 #include <GL/glew.h>
@@ -199,22 +199,102 @@ int main()
     GLint Projection_location = glGetUniformLocation(shader_program, "Projection");
 
 
+
+    // the transform feedback shader only has a vertex shader
+    std::string transform_vertex_source =
+        "#version 330\n"
+        "uniform vec3 center[3];\n"
+        "uniform float radius[3];\n"
+        "uniform vec3 g;\n"
+        "uniform float dt;\n"
+        "uniform float bounce;\n"
+        "uniform int seed;\n"
+        "layout(location = 0) in vec3 inposition;\n"
+        "layout(location = 1) in vec3 invelocity;\n"
+        "out vec3 outposition;\n"
+        "out vec3 outvelocity;\n"
+        
+        "float hash(int x) {\n"
+        "   x = x*1235167 + gl_VertexID*948737 + seed*9284365;\n"
+        "   x = (x >> 13) ^ x;\n"
+        "   return ((x * (x * x * 60493 + 19990303) + 1376312589) & 0x7fffffff)/float(0x7fffffff-1);\n"
+        "}\n"
+        
+        "void main() {\n"
+        "   outvelocity = invelocity;\n"
+        "   for(int j = 0;j<3;++j) {\n"
+        "       vec3 diff = inposition-center[j];\n"
+        "       float dist = length(diff);\n"
+        "       float vdot = dot(diff, invelocity);\n"
+        "       if(dist<radius[j] && vdot<0.0)\n"
+        "           outvelocity -= bounce*diff*vdot/(dist*dist);\n"
+        "   }\n"
+        "   outvelocity += dt*g;\n"
+        "   outposition = inposition + dt*outvelocity;\n"
+        "   if(outposition.y < -30.0)\n"
+        "   {\n"
+        "       outvelocity = vec3(0,0,0);\n"
+        "       outposition = 0.5-vec3(hash(3*gl_VertexID+0),hash(3*gl_VertexID+1),hash(3*gl_VertexID+2));\n"
+        "       outposition = vec3(0,20,0) + 5.0*outposition;\n"
+        "   }\n"
+        "}\n";
+   
+    // program and shader handles
+    GLuint transform_shader_program, transform_vertex_shader;
+
+    // create and compiler vertex shader
+    transform_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+    source = transform_vertex_source.c_str();
+    length = transform_vertex_source.size();
+    glShaderSource(transform_vertex_shader, 1, &source, &length); 
+    glCompileShader(transform_vertex_shader);
+    if(!check_shader_compile_status(transform_vertex_shader))
+    {
+        return 1;
+    }
+
+    // create program
+    transform_shader_program = glCreateProgram();
     
+    // attach shaders
+    glAttachShader(transform_shader_program, transform_vertex_shader);
+    
+    // specify transform feedback output
+    const char *varyings[] = {"outposition", "outvelocity"};
+    glTransformFeedbackVaryings(transform_shader_program, 2, varyings, GL_INTERLEAVED_ATTRIBS);
+    
+    // link the program and check for errors
+    glLinkProgram(transform_shader_program);
+    check_program_link_status(transform_shader_program);
+
+    GLint center_location = glGetUniformLocation(transform_shader_program, "center");
+    GLint radius_location = glGetUniformLocation(transform_shader_program, "radius");
+    GLint g_location = glGetUniformLocation(transform_shader_program, "g");
+    GLint dt_location = glGetUniformLocation(transform_shader_program, "dt");
+    GLint bounce_location = glGetUniformLocation(transform_shader_program, "bounce");
+    GLint seed_location = glGetUniformLocation(transform_shader_program, "seed");
+
+
+   
     const int particles = 128*1024;
 
     // randomly place particles in a cube
-    std::vector<glm::vec3> vertexData(particles);
-    std::vector<glm::vec3> velocity(particles);
+    std::vector<glm::vec3> vertexData(2*particles);
     for(int i = 0;i<particles;++i)
     {
-        vertexData[i] = glm::vec3(0.5f-float(std::rand())/RAND_MAX,
-                                  0.5f-float(std::rand())/RAND_MAX,
-                                  0.5f-float(std::rand())/RAND_MAX);
-        vertexData[i] = glm::vec3(0.0f,20.0f,0.0f) + 5.0f*vertexData[i];
+        // initial position
+        vertexData[2*i+0] = glm::vec3(
+                                0.5f-float(std::rand())/RAND_MAX,
+                                0.5f-float(std::rand())/RAND_MAX,
+                                0.5f-float(std::rand())/RAND_MAX
+                            );
+        vertexData[2*i+0] = glm::vec3(0.0f,20.0f,0.0f) + 5.0f*vertexData[2*i+0];
+        
+        // initial velocity
+        vertexData[2*i+1] = glm::vec3(0,0,0);
     }
-
     
-    int buffercount = 3;
+    int buffercount = 2;
     // generate vbos and vaos
     GLuint vao[buffercount], vbo[buffercount];
     glGenVertexArrays(buffercount, vao);
@@ -231,13 +311,16 @@ int main()
                         
         // set up generic attrib pointers
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), (char*)0 + 0*sizeof(GLfloat));
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (char*)0 + 0*sizeof(GLfloat));
+        // set up generic attrib pointers
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (char*)0 + 3*sizeof(GLfloat));
     }
 
     // "unbind" vao
     glBindVertexArray(0);
     
-    // we are blending so no depth testing
+    // we ar blending so no depth testing
     glDisable(GL_DEPTH_TEST);
     
     // enable blending
@@ -273,55 +356,33 @@ int main()
         {
             running = false;
         }
-        
-        // update physics
-        for(int i = 0;i<particles;++i)
-        {
-            // resolve sphere collisions
-            for(int j = 0;j<spheres;++j)
-            {
-                glm::vec3 diff = vertexData[i]-center[j];
-                float dist = glm::length(diff);
-                if(dist<radius[j] && glm::dot(diff, velocity[i])<0.0f)
-                    velocity[i] -= bounce*diff/(dist*dist)*glm::dot(diff, velocity[i]);
-            }
-            // euler iteration
-            velocity[i] += dt*g;
-            vertexData[i] += dt*velocity[i];
-            // reset particles that fall out to a starting position
-            if(vertexData[i].y<-30.0)
-            {
-                vertexData[i] = glm::vec3(
-                                    0.5f-float(std::rand())/RAND_MAX,
-                                    0.5f-float(std::rand())/RAND_MAX,
-                                    0.5f-float(std::rand())/RAND_MAX
-                                );
-                vertexData[i] = glm::vec3(0.0f,20.0f,0.0f) + 5.0f*vertexData[i];
-                velocity[i] = glm::vec3(0,0,0);
-            }
-        }
-        
-        // bind a buffer to upload to
-        glBindBuffer(GL_ARRAY_BUFFER, vbo[(current_buffer+buffercount-1)%buffercount]);
-        
-        // explicitly invalidate the buffer
-        glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3)*vertexData.size(), 0, GL_STATIC_DRAW);
 
-        // map the buffer
-        glm::vec3 *mapped = 
-            reinterpret_cast<glm::vec3*>(
-                glMapBufferRange(GL_ARRAY_BUFFER, 0,
-                    sizeof(glm::vec3)*vertexData.size(),
-                    GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT
-                )
-            );
-            
-        // copy data into the mapped memory
-        std::copy(vertexData.begin(), vertexData.end(), mapped);
-        
-        // unmap the buffer
-        glUnmapBuffer(GL_ARRAY_BUFFER);
 
+        // use the transform shader program
+        glUseProgram(transform_shader_program);
+
+        // set the uniforms
+        glUniform3fv(center_location, 3, reinterpret_cast<GLfloat*>(center)); 
+        glUniform1fv(radius_location, 3, reinterpret_cast<GLfloat*>(radius));
+        glUniform3fv(g_location, 1, glm::value_ptr(g));
+        glUniform1f(dt_location, dt);
+        glUniform1f(bounce_location, bounce);
+        glUniform1i(seed_location, std::rand());
+
+        // bind the current vao
+        glBindVertexArray(vao[(current_buffer+1)%buffercount]);
+
+        // bind transform feedback target
+        glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, vbo[current_buffer]);
+
+        glEnable(GL_RASTERIZER_DISCARD);
+
+        // perform transform feedback
+        glBeginTransformFeedback(GL_POINTS);
+        glDrawArrays(GL_POINTS, 0, particles);
+        glEndTransformFeedback();
+
+        glDisable(GL_RASTERIZER_DISCARD);
         
         // clear first
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -376,6 +437,10 @@ int main()
     glDeleteShader(geometry_shader);
     glDeleteShader(fragment_shader);
     glDeleteProgram(shader_program);
+
+    glDetachShader(transform_shader_program, transform_vertex_shader);	
+    glDeleteShader(transform_vertex_shader);
+    glDeleteProgram(transform_shader_program);
     
     glfwTerminate();
     return 0;

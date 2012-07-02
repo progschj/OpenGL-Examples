@@ -244,7 +244,7 @@ int main()
     glBindVertexArray(0);
 
     
-    // we ar blending so no depth testing
+    // we are blending so no depth testing
     glDisable(GL_DEPTH_TEST);
     
     // enable blending
