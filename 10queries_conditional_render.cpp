@@ -382,7 +382,7 @@ int main()
         glGenBuffers(1, &chunk.ibo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, chunk.ibo);
         
-        chunk.quadcount = vertexData.size()/4;
+        chunk.quadcount = vertexData.size()/8;
         std::vector<GLuint> indexData(6*chunk.quadcount);
         for(int i = 0;i<chunk.quadcount;++i)
         {
@@ -716,3 +716,4 @@ int main()
     glfwTerminate();
     return 0;
 }
+
