@@ -227,7 +227,7 @@ int main()
         glBindBuffer(GL_ARRAY_BUFFER, vbo[i]);
 
         // fill with initial data
-        glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3)*vertexData.size(), &vertexData[0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3)*vertexData.size(), &vertexData[0], GL_DYNAMIC_DRAW);
                         
         // set up generic attrib pointers
         glEnableVertexAttribArray(0);
@@ -305,7 +305,7 @@ int main()
         glBindBuffer(GL_ARRAY_BUFFER, vbo[(current_buffer+buffercount-1)%buffercount]);
         
         // explicitly invalidate the buffer
-        glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3)*vertexData.size(), 0, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3)*vertexData.size(), 0, GL_DYNAMIC_DRAW);
 
         // map the buffer
         glm::vec3 *mapped = 

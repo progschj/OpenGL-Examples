@@ -102,11 +102,11 @@ int main()
         
     std::string fragment_source =
         "#version 330\n"
-        "uniform sampler2D texture;\n" // texture uniform
+        "uniform sampler2D tex;\n" // texture uniform
         "in vec2 ftexcoord;\n"
         "layout(location = 0) out vec4 FragColor;\n"
         "void main() {\n"
-        "   FragColor = texture2D(texture, ftexcoord);\n"
+        "   FragColor = texture(tex, ftexcoord);\n"
         "}\n";
    
     // program and shader handles
@@ -150,7 +150,7 @@ int main()
     check_program_link_status(shader_program);
     
     // get texture uniform location
-    GLint texture_location = glGetUniformLocation(shader_program, "texture");
+    GLint texture_location = glGetUniformLocation(shader_program, "tex");
     
     // vao and vbo handle
     GLuint vao, vbo, ibo;
