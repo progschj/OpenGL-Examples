@@ -236,8 +236,8 @@ int main()
  
     // create and compiler fragment shader
     query_fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    source = fragment_source.c_str();
-    length = fragment_source.size();
+    source = query_fragment_source.c_str();
+    length = query_fragment_source.size();
     glShaderSource(query_fragment_shader, 1, &source, &length);   
     glCompileShader(query_fragment_shader);
     if(!check_shader_compile_status(query_fragment_shader))
