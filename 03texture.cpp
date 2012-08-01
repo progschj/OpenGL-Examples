@@ -210,8 +210,8 @@ int main()
 
     // create some image data
     std::vector<GLubyte> image(4*width*height);
-    for(size_t j = 0;j<height;++j)
-        for(size_t i = 0;i<width;++i)
+    for(int j = 0;j<height;++j)
+        for(int i = 0;i<width;++i)
         {
             size_t index = j*width + i;
             image[4*index + 0] = 0xFF*(j/10%2)*(i/10%2); // R

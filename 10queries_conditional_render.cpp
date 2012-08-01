@@ -590,7 +590,7 @@ int main()
         // sort chunks by distance
         std::sort(chunks.begin(), chunks.end(), DistancePred(position));
         
-        int i = 0;
+        size_t i = 0;
         float maxdist = chunksize;
 
         // start timer query
@@ -599,7 +599,7 @@ int main()
         // peel chunks
         while(i!=chunks.size())
         {
-            int j = i;
+            size_t j = i;
             if(occlusion_cull)
             {
                 // start occlusion queries and render for the current slice
@@ -688,7 +688,7 @@ int main()
     
     // delete the created objects
     
-    for(int i = 0;i<chunks.size();++i)
+    for(size_t i = 0;i<chunks.size();++i)
     {    
         glDeleteVertexArrays(1, &chunks[i].vao);
         glDeleteBuffers(1, &chunks[i].vbo);
