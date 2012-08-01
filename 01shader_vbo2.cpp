@@ -1,4 +1,4 @@
-/* OpenGL example code - Shader and VBO
+/* OpenGL example code - Tesselation
  * 
  * This example shows the setup and usage of shaders and a vbo+vao
  * In this example the attrbute locations are set via BindAttribLocation
@@ -78,7 +78,7 @@ int main()
     glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 3);
  
     // create a window
-    glfwOpenWindow(width, height, 0, 0, 0, 0, 0, 0, GLFW_WINDOW);
+    glfwOpenWindow(width, height, 0, 0, 0, 8, 24, 8, GLFW_WINDOW);
     
     // setup windows close callback
     glfwSetWindowCloseCallback(closedWindow);

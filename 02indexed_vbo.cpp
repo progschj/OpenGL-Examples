@@ -73,7 +73,7 @@ int main()
     glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 3);
  
     // create a window
-    glfwOpenWindow(width, height, 0, 0, 0, 0, 0, 0, GLFW_WINDOW);
+    glfwOpenWindow(width, height, 0, 0, 0, 8, 24, 8, GLFW_WINDOW);
     
     // setup windows close callback
     glfwSetWindowCloseCallback(closedWindow);

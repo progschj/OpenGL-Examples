@@ -12,14 +12,14 @@
  */
  
 /* index
- * line  111: vertex shader generates vertices from InstanceID/VertexID
- * line  128: tessellation control shader    
- * line  152: tessellation evaluation shader    
- * line  171: fragment shader with simple phong lighting        
- * line  191: shader compilation   
- * line  263: terrain generation
- * line  319: input handling        
- * line  404: draw call       
+ * line  112: vertex shader generates vertices from InstanceID/VertexID
+ * line  129: tessellation control shader    
+ * line  153: tessellation evaluation shader    
+ * line  172: fragment shader with simple phong lighting        
+ * line  192: shader compilation   
+ * line  264: terrain generation
+ * line  320: input handling        
+ * line  405: draw call       
  */
 
 #include <GL/glew.h>
@@ -90,7 +90,8 @@ int main()
     glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 0);
  
     // create a window
-    glfwOpenWindow(width, height, 0, 0, 0, 0, 0, 0, GLFW_WINDOW);
+    glfwOpenWindow(width, height, 0, 0, 0, 8, 24, 8, GLFW_WINDOW);
+    glfwSwapInterval(1);
     
     // setup windows close callback
     glfwSetWindowCloseCallback(closedWindow);
