@@ -8,9 +8,9 @@
  */
 
 /* index
- * line  109: geometry shader source    
- * line  213: creation of galaxy distribution            
- * line  291: draw call       
+ * line  119: geometry shader source    
+ * line  223: creation of galaxy distribution            
+ * line  301: draw call       
  */
 
 #include <GL/glew.h>
@@ -74,7 +74,11 @@ int main()
     int width = 640;
     int height = 480;
     
-    glfwInit();
+    if(glfwInit() == GL_FALSE)
+    {
+        std::cerr << "failed to init GLFW" << std::endl;
+        return 1;
+    }
 
     // sadly glew doesn't play nice with core profiles... 
     glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
@@ -82,7 +86,12 @@ int main()
     glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 3);
  
     // create a window
-    glfwOpenWindow(width, height, 0, 0, 0, 8, 24, 8, GLFW_WINDOW);
+    if(glfwOpenWindow(width, height, 0, 0, 0, 8, 24, 8, GLFW_WINDOW) == GL_FALSE)
+    {
+        std::cerr << "failed to open window" << std::endl;
+        glfwTerminate();
+        return 1;
+    }
     
     // setup windows close callback
     glfwSetWindowCloseCallback(closedWindow);
@@ -92,6 +101,7 @@ int main()
     if (glew_error != GLEW_OK)
     {
         std::cerr << "failed to init GLEW: " << glewGetErrorString(glew_error) << std::endl;
+        glfwCloseWindow();
         glfwTerminate();
         return 1;
     }
@@ -316,6 +326,7 @@ int main()
     glDeleteShader(fragment_shader);
     glDeleteProgram(shader_program);
     
+    glfwCloseWindow();
     glfwTerminate();
     return 0;
 }

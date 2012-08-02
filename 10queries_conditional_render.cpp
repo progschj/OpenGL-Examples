@@ -12,16 +12,16 @@
  */
 
 /* index
- * line  143: chunk draw shader
- * line  209: occlusion query shader
- * line  263: chunk generation
- * line  484: timer query setup
- * line  513: input handling        
- * line  584: beginning of drawing
- * line  596: start timer query        
- * line  602: occlusion queries
- * line  633: actual rendering            
- * line  664: end timer query and handle results
+ * line  153: chunk draw shader
+ * line  219: occlusion query shader
+ * line  273: chunk generation
+ * line  494: timer query setup
+ * line  523: input handling        
+ * line  594: beginning of drawing
+ * line  606: start timer query        
+ * line  612: occlusion queries
+ * line  643: actual rendering            
+ * line  674: end timer query and handle results
  */
 
 #include <GL/glew.h>
@@ -114,7 +114,11 @@ int main()
     int width = 640;
     int height = 480;
     
-    glfwInit();
+    if(glfwInit() == GL_FALSE)
+    {
+        std::cerr << "failed to init GLFW" << std::endl;
+        return 1;
+    }
 
     // sadly glew doesn't play nice with core profiles... 
     glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
@@ -122,7 +126,12 @@ int main()
     glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 3);
  
     // create a window
-    glfwOpenWindow(width, height, 0, 0, 0, 8, 24, 8, GLFW_WINDOW);
+    if(glfwOpenWindow(width, height, 0, 0, 0, 8, 24, 8, GLFW_WINDOW) == GL_FALSE)
+    {
+        std::cerr << "failed to open window" << std::endl;
+        glfwTerminate();
+        return 1;
+    }
     
     // setup windows close callback
     glfwSetWindowCloseCallback(closedWindow);
@@ -136,6 +145,7 @@ int main()
     if (glew_error != GLEW_OK)
     {
         std::cerr << "failed to init GLEW: " << glewGetErrorString(glew_error) << std::endl;
+        glfwCloseWindow();
         glfwTerminate();
         return 1;
     }
@@ -713,6 +723,7 @@ int main()
     glDeleteShader(query_fragment_shader);
     glDeleteProgram(query_shader_program);
     
+    glfwCloseWindow();
     glfwTerminate();
     return 0;
 }

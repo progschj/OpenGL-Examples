@@ -8,9 +8,9 @@
  */
 
 /* index
- * line  108: shader source code    
- * line  296: texture creation
- * line  346: bind texture as image
+ * line  119: shader source code    
+ * line  307: texture creation
+ * line  357: bind texture as image
  */
 
 #include <GL/glew.h>
@@ -71,17 +71,25 @@ int main()
     int width = 512;
     int height = 512;
     
-    glfwInit();
-
+    if(glfwInit() == GL_FALSE)
+    {
+        std::cerr << "failed to init GLFW" << std::endl;
+        return 1;
+    }
+    
+    
     // sadly glew doesn't play nice with core profiles... 
     glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
     glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3);
     glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 3);
  
     // create a window
-    glfwOpenWindow(width, height, 0, 0, 0, 8, 24, 8, GLFW_WINDOW);
-    
-    glfwSwapInterval(1);
+    if(glfwOpenWindow(width, height, 0, 0, 0, 8, 24, 8, GLFW_WINDOW) == GL_FALSE)
+    {
+        std::cerr << "failed to open window" << std::endl;
+        glfwTerminate();
+        return 1;
+    }
     
     // setup windows close callback
     glfwSetWindowCloseCallback(closedWindow);
@@ -91,9 +99,12 @@ int main()
     if (glew_error != GLEW_OK)
     {
         std::cerr << "failed to init GLEW: " << glewGetErrorString(glew_error) << std::endl;
+        glfwCloseWindow();
         glfwTerminate();
         return 1;
     }
+    
+    glfwSwapInterval(1);
     
     // check if extension is available
     // shader_image_load_store is core in opengl 4 but since most
@@ -418,6 +429,7 @@ int main()
     glDeleteShader(fragment2_shader);
     glDeleteProgram(shader2_program);
 
+    glfwCloseWindow();
     glfwTerminate();
     return 0;
 }

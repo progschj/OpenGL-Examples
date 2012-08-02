@@ -12,14 +12,14 @@
  */
  
 /* index
- * line  112: vertex shader generates vertices from InstanceID/VertexID
- * line  129: tessellation control shader    
- * line  153: tessellation evaluation shader    
- * line  172: fragment shader with simple phong lighting        
- * line  192: shader compilation   
- * line  264: terrain generation
- * line  320: input handling        
- * line  405: draw call       
+ * line  122: vertex shader generates vertices from InstanceID/VertexID
+ * line  139: tessellation control shader    
+ * line  163: tessellation evaluation shader    
+ * line  182: fragment shader with simple phong lighting        
+ * line  202: shader compilation   
+ * line  274: terrain generation
+ * line  330: input handling        
+ * line  415: draw call       
  */
 
 #include <GL/glew.h>
@@ -82,7 +82,11 @@ int main()
     int width = 640;
     int height = 480;
     
-    glfwInit();
+    if(glfwInit() == GL_FALSE)
+    {
+        std::cerr << "failed to init GLFW" << std::endl;
+        return 1;
+    }
 
     // we need a 4.0 profile this time
     glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
@@ -90,7 +94,12 @@ int main()
     glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 0);
  
     // create a window
-    glfwOpenWindow(width, height, 0, 0, 0, 8, 24, 8, GLFW_WINDOW);
+    if(glfwOpenWindow(width, height, 0, 0, 0, 8, 24, 8, GLFW_WINDOW) == GL_FALSE)
+    {
+        std::cerr << "failed to open window" << std::endl;
+        glfwTerminate();
+        return 1;
+    }
     glfwSwapInterval(1);
     
     // setup windows close callback
@@ -105,6 +114,7 @@ int main()
     if (glew_error != GLEW_OK)
     {
         std::cerr << "failed to init GLEW: " << glewGetErrorString(glew_error) << std::endl;
+        glfwCloseWindow();
         glfwTerminate();
         return 1;
     }
@@ -430,6 +440,7 @@ int main()
     glDeleteShader(fragment_shader);
     glDeleteProgram(shader_program);
     
+    glfwCloseWindow();
     glfwTerminate();
     return 0;
 }

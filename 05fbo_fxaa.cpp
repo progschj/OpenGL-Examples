@@ -7,13 +7,13 @@
  */
 
 /* index
- * line  262: fxaa shader
- * line  570: target texture setup    
- * line  589: render buffer setup
- * line  598: fbo setup 
- * line  635: fbo binding
- * line  662: scene draw call       
- * line  687: post processing draw call           
+ * line  272: fxaa shader
+ * line  580: target texture setup    
+ * line  599: render buffer setup
+ * line  608: fbo setup 
+ * line  645: fbo binding
+ * line  672: scene draw call       
+ * line  697: post processing draw call           
  */
 
 #include <GL/glew.h>
@@ -76,7 +76,11 @@ int main()
     int width = 640;
     int height = 480;
     
-    glfwInit();
+    if(glfwInit() == GL_FALSE)
+    {
+        std::cerr << "failed to init GLFW" << std::endl;
+        return 1;
+    }
 
     // sadly glew doesn't play nice with core profiles... 
     glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
@@ -84,7 +88,12 @@ int main()
     glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 3);
  
     // create a window
-    glfwOpenWindow(width, height, 0, 0, 0, 8, 24, 8, GLFW_WINDOW);
+    if(glfwOpenWindow(width, height, 0, 0, 0, 8, 24, 8, GLFW_WINDOW) == GL_FALSE)
+    {
+        std::cerr << "failed to open window" << std::endl;
+        glfwTerminate();
+        return 1;
+    }
     
     // setup windows close callback
     glfwSetWindowCloseCallback(closedWindow);
@@ -94,6 +103,7 @@ int main()
     if (glew_error != GLEW_OK)
     {
         std::cerr << "failed to init GLEW: " << glewGetErrorString(glew_error) << std::endl;
+        glfwCloseWindow();
         glfwTerminate();
         return 1;
     }
@@ -722,6 +732,7 @@ int main()
     glDeleteShader(post_effect_fragment_shader);
     glDeleteProgram(post_effect_shader_program);
 
+    glfwCloseWindow();
     glfwTerminate();
     return 0;
 }
