@@ -255,9 +255,8 @@ int main()
         "layout(rgba32f, location = 1) uniform imageBuffer positions;\n"
         "layout(rgba32f, location = 2) uniform imageBuffer velocities;\n"
         
-        
-        "void main() {\n"
         "shared vec4 tmp[256];\n"
+        "void main() {\n"
         "   int N = int(gl_NumWorkGroups.x*gl_WorkGroupSize.x);\n"
         "   int index = int(gl_GlobalInvocationID);\n"
         "   int tiles = N/int(gl_WorkGroupSize.x);\n"
