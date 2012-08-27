@@ -254,24 +254,22 @@ int main()
         "layout(location = 0) uniform float dt;\n"
         "layout(rgba32f, location = 1) uniform imageBuffer positions;\n"
         "layout(rgba32f, location = 2) uniform imageBuffer velocities;\n"
+        "layout(location = 3) uniform int tile;\n"
         
         "shared vec4 tmp[256];\n"
         "void main() {\n"
-        "   int N = int(gl_NumWorkGroups.x*gl_WorkGroupSize.x);\n"
         "   int index = int(gl_GlobalInvocationID);\n"
-        "   int tiles = N/int(gl_WorkGroupSize.x);\n"
         "   vec3 position = imageLoad(positions, index).xyz;\n"
         "   vec3 velocity = imageLoad(velocities, index).xyz;\n"
         "   vec3 acceleration = vec3(0,0,0);\n"
-        "   for(int tile = 0;tile < tiles;++tile) {\n"
-        "       tmp[gl_LocalInvocationIndex] = imageLoad(positions, 256*tile + int(gl_LocalInvocationIndex));\n"
-        "       groupMemoryBarrier();\n"
-        "       for(int i = 0;i<gl_WorkGroupSize.x;++i) {\n"
-        "           vec3 other = tmp[i].xyz;\n"
-        "           vec3 diff = position - other;\n"
-        "           float invdist = 1/sqrt(dot(diff,diff)+0.00001);\n"
-        "           acceleration -= diff*0.1*invdist*invdist*invdist;\n"
-        "       }\n"
+        "   tmp[gl_LocalInvocationIndex] = imageLoad(positions, 256*tile + int(gl_LocalInvocationIndex));\n"
+        "   groupMemoryBarrier();\n"
+        "   barrier();\n"
+        "   for(int i = 0;i<gl_WorkGroupSize.x;++i) {\n"
+        "       vec3 other = tmp[i].xyz;\n"
+        "       vec3 diff = position - other;\n"
+        "       float invdist = 1/sqrt(dot(diff,diff)+0.00001);\n"
+        "       acceleration -= diff*0.1*invdist*invdist*invdist;\n"
         "   }\n"
         "   imageStore(velocities, index, vec4(velocity+dt*acceleration,0));\n"
         "}\n";
@@ -458,15 +456,23 @@ int main()
         space_down = glfwGetKey(GLFW_KEY_SPACE);
         
         
-        // particle updated
-        if(tiled)
-            glUseProgram(tiled_acceleration_program);
-        else
-            glUseProgram(acceleration_program);
-
         glBeginQuery(GL_TIME_ELAPSED, query);
         
-        glDispatchCompute(particles/256, 1, 1);
+        if(tiled)
+        {
+            glUseProgram(tiled_acceleration_program);
+            int tiles = particles/256;
+            for(int tile = 0;tile<tiles;++tile)
+            {
+                glUniform1i(3, tile);
+                glDispatchCompute(particles/256, 1, 1);
+            }
+        }
+        else
+        {
+            glUseProgram(acceleration_program);
+            glDispatchCompute(particles/256, 1, 1);
+        }
         
         glEndQuery(GL_TIME_ELAPSED);
         
