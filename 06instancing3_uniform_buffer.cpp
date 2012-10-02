@@ -324,7 +324,7 @@ int main()
         // set the ViewProjection in the uniform buffer
         glBindBuffer(GL_UNIFORM_BUFFER, ubo);
         glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(float)*4*4, glm::value_ptr(ViewProjection));
-        glBindBufferRange(GL_UNIFORM_BUFFER, Matrices_binding, ubo, 0, sizeof(float)*4*4);
+        glBindBufferRange(GL_UNIFORM_BUFFER, Matrices_binding, ubo, 0, sizeof(float)*4*4*9);
         
         // bind the vao
         glBindVertexArray(vao);
