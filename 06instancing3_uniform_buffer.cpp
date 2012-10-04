@@ -13,7 +13,7 @@
  * line  332: draw call       
  */
 
-#include <GL/glew.h>
+#include <GL3/gl3w.h>
 #include <GL/glfw.h>
 
 //glm is used to create perspective and transform matrices
@@ -80,7 +80,7 @@ int main()
     }
 
     // sadly glew doesn't play nice with core profiles... 
-    glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+    glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3);
     glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 3);
  
@@ -95,11 +95,11 @@ int main()
     // setup windows close callback
     glfwSetWindowCloseCallback(closedWindow);
     
-    glewExperimental = GL_TRUE;
-    GLenum glew_error = glewInit();
-    if (glew_error != GLEW_OK)
+    
+    
+    if (gl3wInit())
     {
-        std::cerr << "failed to init GLEW: " << glewGetErrorString(glew_error) << std::endl;
+        std::cerr << "failed to init GL3W" << std::endl;
         glfwCloseWindow();
         glfwTerminate();
         return 1;

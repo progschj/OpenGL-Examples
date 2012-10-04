@@ -22,7 +22,7 @@
  * line  415: draw call       
  */
 
-#include <GL/glew.h>
+#include <GL3/gl3w.h>
 #include <GL/glfw.h>
 
 #include <glm/glm.hpp>
@@ -89,7 +89,7 @@ int main()
     }
 
     // we need a 4.0 profile this time
-    glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+    glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 4);
     glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 0);
  
@@ -108,16 +108,18 @@ int main()
     // this time we disable the mouse cursor since we want differential
     // mouse input
     glfwDisable(GLFW_MOUSE_CURSOR);
-    
-    glewExperimental = GL_TRUE;
-    GLenum glew_error = glewInit();
-    if (glew_error != GLEW_OK)
+        
+    if (gl3wInit())
     {
-        std::cerr << "failed to init GLEW: " << glewGetErrorString(glew_error) << std::endl;
+        std::cerr << "failed to init GL3W" << std::endl;
         glfwCloseWindow();
         glfwTerminate();
         return 1;
     }
+
+	GLuint vao;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
 
     // shader source code
     std::string vertex_source =
@@ -429,7 +431,7 @@ int main()
 
     // delete the created objects
 
-    
+    glDeleteVertexArrays(1, &vao);
     glDetachShader(shader_program, vertex_shader);
     glDetachShader(shader_program, tess_control_shader);
     glDetachShader(shader_program, tess_eval_shader);
