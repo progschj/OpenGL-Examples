@@ -9,8 +9,8 @@
 
 /* index
  * line  110: shader source code    
- * line  298: texture creation
- * line  348: bind texture as image
+ * line  288: texture creation
+ * line  338: bind texture as image
  */
 
 #include <GL3/gl3w.h>
@@ -112,10 +112,7 @@ int main()
     std::string vertex_source =
         "#version 400\n"
         "layout(location = 0) in vec4 vposition;\n"
-        "layout(location = 1) in vec2 vtexcoord;\n"
-        "out vec2 ftexcoord;\n"
         "void main() {\n"
-        "   ftexcoord = vtexcoord;\n"
         "   gl_Position = vposition;\n"
         "}\n";
     
@@ -123,14 +120,12 @@ int main()
     // updates the image in place
     std::string fragment1_source =
         "#version 400\n"
-        "#extension GL_ARB_shader_image_load_store : enable\n"
         "uniform float dt;\n"
         "uniform ivec2 image_size;\n"
         "uniform layout(rgba32f) coherent image2D image;\n"
-        "in vec2 ftexcoord;\n"
         "layout(location = 0) out vec4 FragColor;\n"
         "void main() {\n"
-        "   ivec2 coords = ivec2(ftexcoord*image_size);\n"
+        "   ivec2 coords = ivec2(gl_FragCoord.xy);\n"
         "	vec4 HE = imageLoad(image, coords);\n"
 		"	float Ezdx = HE.z-imageLoad(image, coords-ivec2(1, 0)).z;\n"
 		"	float Ezdy = HE.z-imageLoad(image, coords-ivec2(0, 1)).z;\n"
@@ -143,15 +138,13 @@ int main()
     // purposes
     std::string fragment2_source =
         "#version 400\n"
-        "#extension GL_ARB_shader_image_load_store : enable\n"
         "uniform float t;\n"
         "uniform float dt;\n"
         "uniform ivec2 image_size;\n"
         "uniform layout(rgba32f) image2D image;\n"
-        "in vec2 ftexcoord;\n"
         "layout(location = 0) out vec4 FragColor;\n"
         "void main() {\n"
-        "   ivec2 coords = ivec2(ftexcoord*image_size);\n"
+        "   ivec2 coords = ivec2(gl_FragCoord.xy);\n"
 		
         "	float e = 1;\n"
         "	vec4 HE = imageLoad(image, coords);\n"
@@ -259,26 +252,23 @@ int main()
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
             
-    // data for a fullscreen quad (this time with texture coords)
+    // data for a fullscreen quad
     GLfloat vertexData[] = {
-    //  X     Y     Z           U     V     
-       1.0f, 1.0f, 0.0f,       1.0f, 1.0f, // vertex 0
-      -1.0f, 1.0f, 0.0f,       0.0f, 1.0f, // vertex 1
-       1.0f,-1.0f, 0.0f,       1.0f, 0.0f, // vertex 2
-      -1.0f,-1.0f, 0.0f,       0.0f, 0.0f, // vertex 3
-    }; // 4 vertices with 5 components (floats) each
+    //  X     Y     Z
+       1.0f, 1.0f, 0.0f, // vertex 0
+      -1.0f, 1.0f, 0.0f, // vertex 1
+       1.0f,-1.0f, 0.0f, // vertex 2
+      -1.0f,-1.0f, 0.0f, // vertex 3
+    }; // 4 vertices with 3 components (floats) each
 
     // fill with data
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*4*5, vertexData, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*4*3, vertexData, GL_STATIC_DRAW);
                     
            
     // set up generic attrib pointers
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (char*)0 + 0*sizeof(GLfloat));
- 
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (char*)0 + 3*sizeof(GLfloat));
-    
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), (char*)0 + 0*sizeof(GLfloat));
+
     
     // generate and bind the index buffer object
     glGenBuffers(1, &ibo);
@@ -320,8 +310,8 @@ int main()
     // set texture parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
     
     // set texture content
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, &image[0]);
