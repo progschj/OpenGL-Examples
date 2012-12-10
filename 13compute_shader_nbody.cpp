@@ -8,7 +8,7 @@
  * Autor: Jakob Progsch
  */
 
-#include <GL/gl3w.h>
+#include <GL3/gl3w.h>
 #include <GL/glfw.h>
 
 //glm is used to create perspective and transform matrices
