@@ -6,10 +6,11 @@ project(OPENGLEXAMPLES)
  
 find_package(OpenGL REQUIRED)
 find_package(GLFW REQUIRED)
-find_package(GLEW REQUIRED)
- 
+#find_package(GLEW REQUIRED)
+set(GL3W_LIBRARY "-lgl3w") 
+
 set(CMAKE_CXX_FLAGS "-O2 -Wall -Wextra")
-SET(LIBRARIES ${OPENGL_LIBRARY} ${GLFW_LIBRARY} ${GLEW_LIBRARY})
+SET(LIBRARIES ${GLFW_LIBRARY} ${GL3W_LIBRARY} ${OPENGL_LIBRARY})
 
 link_directories (${OPENGLEXAMPLES_BINARY_DIR}/bin)
 

@@ -8,12 +8,12 @@
  */
 
 /* index
- * line  119: shader source code    
- * line  307: texture creation
- * line  357: bind texture as image
+ * line  110: shader source code    
+ * line  288: texture creation
+ * line  338: bind texture as image
  */
 
-#include <GL/glew.h>
+#include <GL3/gl3w.h>
 #include <GL/glfw.h>
 
 #include <glm/glm.hpp>
@@ -79,9 +79,9 @@ int main()
     
     
     // sadly glew doesn't play nice with core profiles... 
-    glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
-    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3);
-    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 3);
+    glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 4);
+    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 0);
  
     // create a window
     if(glfwOpenWindow(width, height, 0, 0, 0, 8, 24, 8, GLFW_WINDOW) == GL_FALSE)
@@ -94,11 +94,11 @@ int main()
     // setup windows close callback
     glfwSetWindowCloseCallback(closedWindow);
     
-    glewExperimental = GL_TRUE;
-    GLenum glew_error = glewInit();
-    if (glew_error != GLEW_OK)
+    
+    
+    if (gl3wInit())
     {
-        std::cerr << "failed to init GLEW: " << glewGetErrorString(glew_error) << std::endl;
+        std::cerr << "failed to init GL3W" << std::endl;
         glfwCloseWindow();
         glfwTerminate();
         return 1;
@@ -106,40 +106,26 @@ int main()
     
     glfwSwapInterval(1);
     
-    // check if extension is available
-    // shader_image_load_store is core in opengl 4 but since most
-    // opengl 3 hardware is able to support it also we use the extension
-    if(!glewGetExtension("GL_ARB_shader_image_load_store"))
-    {
-        std::cout << "GL_ARB_shader_image_load_store not available" << std::endl;
-        glfwTerminate();
-        return 1;
-    }
 
     // shader source code
     // shared vertex shader
     std::string vertex_source =
-        "#version 330\n"
+        "#version 400\n"
         "layout(location = 0) in vec4 vposition;\n"
-        "layout(location = 1) in vec2 vtexcoord;\n"
-        "out vec2 ftexcoord;\n"
         "void main() {\n"
-        "   ftexcoord = vtexcoord;\n"
         "   gl_Position = vposition;\n"
         "}\n";
     
     // the first fragment shader doesn't output anything since it only
     // updates the image in place
     std::string fragment1_source =
-        "#version 330\n"
-        "#extension GL_ARB_shader_image_load_store : enable\n"
+        "#version 400\n"
         "uniform float dt;\n"
         "uniform ivec2 image_size;\n"
         "uniform layout(rgba32f) coherent image2D image;\n"
-        "in vec2 ftexcoord;\n"
         "layout(location = 0) out vec4 FragColor;\n"
         "void main() {\n"
-        "   ivec2 coords = ivec2(ftexcoord*image_size);\n"
+        "   ivec2 coords = ivec2(gl_FragCoord.xy);\n"
         "	vec4 HE = imageLoad(image, coords);\n"
 		"	float Ezdx = HE.z-imageLoad(image, coords-ivec2(1, 0)).z;\n"
 		"	float Ezdy = HE.z-imageLoad(image, coords-ivec2(0, 1)).z;\n"
@@ -151,16 +137,14 @@ int main()
     // the second fragment shader also outputs the frag color for display
     // purposes
     std::string fragment2_source =
-        "#version 330\n"
-        "#extension GL_ARB_shader_image_load_store : enable\n"
+        "#version 400\n"
         "uniform float t;\n"
         "uniform float dt;\n"
         "uniform ivec2 image_size;\n"
         "uniform layout(rgba32f) image2D image;\n"
-        "in vec2 ftexcoord;\n"
         "layout(location = 0) out vec4 FragColor;\n"
         "void main() {\n"
-        "   ivec2 coords = ivec2(ftexcoord*image_size);\n"
+        "   ivec2 coords = ivec2(gl_FragCoord.xy);\n"
 		
         "	float e = 1;\n"
         "	vec4 HE = imageLoad(image, coords);\n"
@@ -174,9 +158,9 @@ int main()
         "   HE.z = HE.z*(1-dt*r/e) + Eout;\n"
         
         // add source at image center
-        "   float s = 0;\n"
-        "   if(coords.x == image_size.x/2 && coords.y == image_size.y/2) s = 30;\n"
-        "   HE.z += s*sin(15*t)*exp(-10*(t-2)*(t-2));\n"
+        "   if(coords.x == image_size.x/2 && coords.y == image_size.y/2) {\n"
+        "   	HE.z += 30*sin(15*t)*exp(-10*(t-2)*(t-2));\n"
+        "	}\n"
         
         "   imageStore(image, coords, HE);\n"
         "   FragColor = vec4(HE.z, HE.w, -HE.z, 1);\n"
@@ -268,26 +252,23 @@ int main()
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
             
-    // data for a fullscreen quad (this time with texture coords)
+    // data for a fullscreen quad
     GLfloat vertexData[] = {
-    //  X     Y     Z           U     V     
-       1.0f, 1.0f, 0.0f,       1.0f, 1.0f, // vertex 0
-      -1.0f, 1.0f, 0.0f,       0.0f, 1.0f, // vertex 1
-       1.0f,-1.0f, 0.0f,       1.0f, 0.0f, // vertex 2
-      -1.0f,-1.0f, 0.0f,       0.0f, 0.0f, // vertex 3
-    }; // 4 vertices with 5 components (floats) each
+    //  X     Y     Z
+       1.0f, 1.0f, 0.0f, // vertex 0
+      -1.0f, 1.0f, 0.0f, // vertex 1
+       1.0f,-1.0f, 0.0f, // vertex 2
+      -1.0f,-1.0f, 0.0f, // vertex 3
+    }; // 4 vertices with 3 components (floats) each
 
     // fill with data
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*4*5, vertexData, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*4*3, vertexData, GL_STATIC_DRAW);
                     
            
     // set up generic attrib pointers
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (char*)0 + 0*sizeof(GLfloat));
- 
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5*sizeof(GLfloat), (char*)0 + 3*sizeof(GLfloat));
-    
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), (char*)0 + 0*sizeof(GLfloat));
+
     
     // generate and bind the index buffer object
     glGenBuffers(1, &ibo);
@@ -329,8 +310,8 @@ int main()
     // set texture parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
     
     // set texture content
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, &image[0]);
@@ -354,7 +335,7 @@ int main()
         // clear first
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glBindImageTextureEXT(0, texture, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
+        glBindImageTexture(0, texture, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
         
         // bind the vao
         glBindVertexArray(vao);
