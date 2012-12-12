@@ -14,3 +14,8 @@ to update particles on the GPU or Occlusion Queries + Conditional Render
 to optimize rendering a Cube (Minecraftlike) Cave. At the same time
 the goal is to keep the examples short and simple enough to not lose
 the focus.
+
+Examples that require OpenGL 4.3 also need a corresponding gl3w version
+that uses the new glcorearb.h header instead of the old GL3.h one. 
+Use shakesodas fork (https://github.com/shakesoda/gl3w/tree/glcorearb)
+and call cmake with "-DBUILD_OGL43=ON".
