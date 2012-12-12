@@ -78,10 +78,10 @@ int main()
     }
     
     
-    // sadly glew doesn't play nice with core profiles... 
+    // select opengl version 
     glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 4);
-    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 0);
+    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 2);
  
     // create a window
     if(glfwOpenWindow(width, height, 0, 0, 0, 8, 24, 8, GLFW_WINDOW) == GL_FALSE)
@@ -110,7 +110,7 @@ int main()
     // shader source code
     // shared vertex shader
     std::string vertex_source =
-        "#version 400\n"
+        "#version 420\n"
         "layout(location = 0) in vec4 vposition;\n"
         "void main() {\n"
         "   gl_Position = vposition;\n"
@@ -119,10 +119,10 @@ int main()
     // the first fragment shader doesn't output anything since it only
     // updates the image in place
     std::string fragment1_source =
-        "#version 400\n"
+        "#version 420\n"
         "uniform float dt;\n"
         "uniform ivec2 image_size;\n"
-        "uniform layout(rgba32f) coherent image2D image;\n"
+        "uniform layout(rgba32f) image2D image;\n"
         "layout(location = 0) out vec4 FragColor;\n"
         "void main() {\n"
         "   ivec2 coords = ivec2(gl_FragCoord.xy);\n"
@@ -137,7 +137,7 @@ int main()
     // the second fragment shader also outputs the frag color for display
     // purposes
     std::string fragment2_source =
-        "#version 400\n"
+        "#version 420\n"
         "uniform float t;\n"
         "uniform float dt;\n"
         "uniform ivec2 image_size;\n"
@@ -326,7 +326,7 @@ int main()
         // reset time every 10 seconds to repeat the sequence
         if(t>10) t -= 10;
         
-        // terminate on excape 
+        // terminate on escape 
         if(glfwGetKey(GLFW_KEY_ESC))
         {
             running = false;

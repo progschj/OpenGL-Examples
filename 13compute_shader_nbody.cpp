@@ -1,13 +1,16 @@
 /* OpenGL example code - Compute Shader N-body
  * 
- * N-body simulating with compute shaders.
- * 
- * note: this example is still "experimental" at this point glew doesn't
- * load 4.3 and a modified gl3w was used.
+ * N-body simulation with compute shaders.
  * 
  * Autor: Jakob Progsch
  */
 
+/* index
+ * line  204: acceleration compute shader source
+ * line  254: tiled acceleration compute shader source 
+ * line  465: compute shader invocations
+ */
+ 
 #include <GL3/gl3w.h>
 #include <GL/glfw.h>
 
@@ -197,7 +200,7 @@ int main()
     glLinkProgram(shader_program);
     check_program_link_status(shader_program);
     
-
+    // straight forward implementation of the nbody kernel
     std::string acceleration_source =
         "#version 430\n"
         "layout(local_size_x=256) in;\n"
@@ -246,7 +249,8 @@ int main()
     glLinkProgram(acceleration_program);
     check_program_link_status(acceleration_program);
 
-
+    // tiled version of the nbody shader that makes use of shared memory
+    // to reduce global memory transactions
     std::string tiled_acceleration_source =
         "#version 430\n"
         "layout(local_size_x=256) in;\n"
@@ -254,25 +258,27 @@ int main()
         "layout(location = 0) uniform float dt;\n"
         "layout(rgba32f, location = 1) uniform imageBuffer positions;\n"
         "layout(rgba32f, location = 2) uniform imageBuffer velocities;\n"
-        "layout(location = 3) uniform int tile;\n"
         
-        "shared vec4 tmp[256];\n"
+        "shared vec4 tmp[gl_WorkGroupSize.x];\n"
         "void main() {\n"
+        "   int N = int(gl_NumWorkGroups.x*gl_WorkGroupSize.x);\n"
         "   int index = int(gl_GlobalInvocationID);\n"
         "   vec3 position = imageLoad(positions, index).xyz;\n"
         "   vec3 velocity = imageLoad(velocities, index).xyz;\n"
         "   vec3 acceleration = vec3(0,0,0);\n"
-        "   tmp[gl_LocalInvocationIndex] = imageLoad(positions, 256*tile + int(gl_LocalInvocationIndex));\n"
-        "   groupMemoryBarrier();\n"
-        "   barrier();\n"
-        "   for(int i = 0;i<gl_WorkGroupSize.x;++i) {\n"
-        "       vec3 other = tmp[i].xyz;\n"
-        "       vec3 diff = position - other;\n"
-        "       float invdist = 1/sqrt(dot(diff,diff)+0.00001);\n"
-        "       acceleration -= diff*0.1*invdist*invdist*invdist;\n"
+        "   for(int tile = 0;tile<N;tile+=int(gl_WorkGroupSize.x)) {\n"
+        "       tmp[gl_LocalInvocationIndex] = imageLoad(positions, tile + int(gl_LocalInvocationIndex));\n"        
+        "       groupMemoryBarrier();\n"
+        "       barrier();\n"
+        "       for(int i = 0;i<gl_WorkGroupSize.x;++i) {\n"
+        "           vec3 other = tmp[i].xyz;\n"
+        "           vec3 diff = position - other;\n"
+        "           float invdist = 1/sqrt(dot(diff,diff)+0.00001);\n"
+        "           acceleration -= diff*0.1*invdist*invdist*invdist;\n"
+        "       }\n"
+        "       groupMemoryBarrier();\n"
+        "       barrier();\n"
         "   }\n"
-        "   groupMemoryBarrier();\n"
-        "   barrier();\n"
         "   imageStore(velocities, index, vec4(velocity+dt*acceleration,0));\n"
         "}\n";
    
@@ -300,8 +306,7 @@ int main()
     glLinkProgram(tiled_acceleration_program);
     check_program_link_status(tiled_acceleration_program);
 
-   
-
+    // the integrate shader does the second part of the euler integration
     std::string integrate_source =
         "#version 430\n"
         "layout(local_size_x=256) in;\n"
@@ -343,7 +348,7 @@ int main()
     check_program_link_status(integrate_program);   
    
    
-    const int particles = 32*1024;
+    const int particles = 16*1024;
 
     // randomly place particles in a cube
     std::vector<glm::vec4> positionData(particles);
@@ -413,7 +418,7 @@ int main()
     glUniform1f(0, dt);
     glUniform1i(1, 0);
     glUniform1i(2, 1);
-        
+            
     glUseProgram(acceleration_program);
     glUniform1f(0, dt);
     glUniform1i(1, 0);
@@ -441,10 +446,7 @@ int main()
     running = true;
     while(running)
     {   
-        // get the time in seconds
-        float t = glfwGetTime();
-        
-        // terminate on excape 
+        // terminate on escape 
         if(glfwGetKey(GLFW_KEY_ESC))
         {
             running = false;
@@ -463,12 +465,7 @@ int main()
         if(tiled)
         {
             glUseProgram(tiled_acceleration_program);
-            int tiles = particles/256;
-            for(int tile = 0;tile<tiles;tile+=1)
-            {
-                glUniform1i(3, tile);
-                glDispatchCompute(particles/256, 1, 1);
-            }
+            glDispatchCompute(particles/256, 1, 1);
         }
         else
         {

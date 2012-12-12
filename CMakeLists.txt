@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 2.6)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules")
  
 project(OPENGLEXAMPLES)
+
+option(BUILD_OGL43 "Bild OpenGL 4.3 examples" OFF)
+mark_as_advanced(BUILD_OGL43)
  
 find_package(OpenGL REQUIRED)
 find_package(GLFW REQUIRED)
@@ -62,3 +65,8 @@ target_link_libraries(11tesselation ${LIBRARIES} )
 
 add_executable (12shader_image_load_store 12shader_image_load_store.cpp)
 target_link_libraries(12shader_image_load_store ${LIBRARIES} )
+
+if(BUILD_OGL43)
+    add_executable (13compute_shader_nbody 13compute_shader_nbody.cpp)
+    target_link_libraries(13compute_shader_nbody ${LIBRARIES} )
+endif()

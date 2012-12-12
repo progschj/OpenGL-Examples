@@ -120,7 +120,7 @@ int main()
         return 1;
     }
 
-    // sadly glew doesn't play nice with core profiles... 
+    // select opengl version 
     glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3);
     glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 3);
