@@ -22,8 +22,8 @@
  * line  415: draw call       
  */
 
-#include <GL3/gl3w.h>
-#include <GL/glfw.h>
+#include <GL/gl3w.h>
+#include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -34,18 +34,9 @@
 #include <string>
 #include <vector>
 
-bool running;
-
-// window close callback function
-int closedWindow()
-{
-    running = false;
-    return GL_TRUE;
-}
 
 // helper to check and display for shader compiler errors
-bool check_shader_compile_status(GLuint obj)
-{
+bool check_shader_compile_status(GLuint obj) {
     GLint status;
     glGetShaderiv(obj, GL_COMPILE_STATUS, &status);
     if(status == GL_FALSE)
@@ -61,8 +52,7 @@ bool check_shader_compile_status(GLuint obj)
 }
 
 // helper to check and display for shader linker error
-bool check_program_link_status(GLuint obj)
-{
+bool check_program_link_status(GLuint obj) {
     GLint status;
     glGetProgramiv(obj, GL_LINK_STATUS, &status);
     if(status == GL_FALSE)
@@ -77,42 +67,33 @@ bool check_program_link_status(GLuint obj)
     return true;
 }
 
-int main()
-{
+int main() {
     int width = 640;
     int height = 480;
     
-    if(glfwInit() == GL_FALSE)
-    {
+    if(glfwInit() == GL_FALSE) {
         std::cerr << "failed to init GLFW" << std::endl;
         return 1;
     }
 
-    // we need a 4.0 profile this time
-    glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 4);
-    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 0);
+    // select opengl version
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
  
     // create a window
-    if(glfwOpenWindow(width, height, 0, 0, 0, 8, 24, 8, GLFW_WINDOW) == GL_FALSE)
-    {
+    GLFWwindow *window;
+    if((window = glfwCreateWindow(width, height, "00skeleton", 0, 0)) == 0) {
         std::cerr << "failed to open window" << std::endl;
         glfwTerminate();
         return 1;
     }
-    glfwSwapInterval(1);
     
-    // setup windows close callback
-    glfwSetWindowCloseCallback(closedWindow);
-    
-    // this time we disable the mouse cursor since we want differential
-    // mouse input
-    glfwDisable(GLFW_MOUSE_CURSOR);
-        
-    if (gl3wInit())
-    {
+    glfwMakeContextCurrent(window);
+
+    if(gl3wInit()) {
         std::cerr << "failed to init GL3W" << std::endl;
-        glfwCloseWindow();
+        glfwDestroyWindow(window);
         glfwTerminate();
         return 1;
     }
@@ -151,14 +132,14 @@ int main()
         "   if(gl_InvocationID == 0) {\n"
         "       vec3 terrainpos = ViewPosition;\n"
         "       terrainpos.z -= clamp(terrainpos.z,-0.1, 0.1);\n"        
-        "       vec4 center = (tcposition[1]+tcposition[2])/2.0;\n"
-        "       gl_TessLevelOuter[0] = min(7.0, 1+tess_scale*0.5/distance(center.xyz, terrainpos));\n"
-        "       center = (tcposition[2]+tcposition[0])/2.0;\n"
-        "       gl_TessLevelOuter[1] = min(7.0, 1+tess_scale*0.5/distance(center.xyz, terrainpos));\n"
-        "       center = (tcposition[0]+tcposition[1])/2.0;\n"
-        "       gl_TessLevelOuter[2] = min(7.0, 1+tess_scale*0.5/distance(center.xyz, terrainpos));\n"
-        "       center = (tcposition[0]+tcposition[1]+tcposition[2])/3.0;\n"
-        "       gl_TessLevelInner[0] = min(8.0, 1+tess_scale*0.7/distance(center.xyz, terrainpos));\n"
+        "       vec4 center = (tposition[1]+tposition[2])/2.0;\n"
+        "       gl_TessLevelOuter[0] = min(6.0, 1+tess_scale*0.5/distance(center.xyz, terrainpos));\n"
+        "       center = (tposition[2]+tposition[0])/2.0;\n"
+        "       gl_TessLevelOuter[1] = min(6.0, 1+tess_scale*0.5/distance(center.xyz, terrainpos));\n"
+        "       center = (tposition[0]+tposition[1])/2.0;\n"
+        "       gl_TessLevelOuter[2] = min(6.0, 1+tess_scale*0.5/distance(center.xyz, terrainpos));\n"
+        "       center = (tposition[0]+tposition[1]+tposition[2])/3.0;\n"
+        "       gl_TessLevelInner[0] = min(7.0, 1+tess_scale*0.7/distance(center.xyz, terrainpos));\n"
         "   }\n"
         "}\n";
 
@@ -214,8 +195,9 @@ int main()
     length = vertex_source.size();
     glShaderSource(vertex_shader, 1, &source, &length); 
     glCompileShader(vertex_shader);
-    if(!check_shader_compile_status(vertex_shader))
-    {
+    if(!check_shader_compile_status(vertex_shader)) {
+        glfwDestroyWindow(window);
+        glfwTerminate();
         return 1;
     }
 
@@ -225,8 +207,9 @@ int main()
     length = tess_control_source.size();
     glShaderSource(tess_control_shader, 1, &source, &length); 
     glCompileShader(tess_control_shader);
-    if(!check_shader_compile_status(tess_control_shader))
-    {
+    if(!check_shader_compile_status(tess_control_shader)) {
+        glfwDestroyWindow(window);
+        glfwTerminate();
         return 1;
     }
     
@@ -236,8 +219,9 @@ int main()
     length = tess_eval_source.size();
     glShaderSource(tess_eval_shader, 1, &source, &length); 
     glCompileShader(tess_eval_shader);
-    if(!check_shader_compile_status(tess_eval_shader))
-    {
+    if(!check_shader_compile_status(tess_eval_shader)) {
+        glfwDestroyWindow(window);
+        glfwTerminate();
         return 1;
     }
  
@@ -247,8 +231,9 @@ int main()
     length = fragment_source.size();
     glShaderSource(fragment_shader, 1, &source, &length);   
     glCompileShader(fragment_shader);
-    if(!check_shader_compile_status(fragment_shader))
-    {
+    if(!check_shader_compile_status(fragment_shader)) {
+        glfwDestroyWindow(window);
+        glfwTerminate();
         return 1;
     }
 
@@ -281,13 +266,13 @@ int main()
     layerdir -= layernorm*glm::dot(layernorm, layerdir);
     layerdir = glm::normalize(layerdir);
     
-    for(int y = 0;y<terrainheight;++y)
-        for(int x = 0;x<terrainwidth;++x)
-        {
+    for(int y = 0;y<terrainheight;++y) {
+        for(int x = 0;x<terrainwidth;++x) {
             glm::vec2 pos(float(x)/terrainwidth,float(y)/terrainheight);
             glm::vec3 tmp = glm::vec3( pos, 0.15f*glm::perlin(5.0f*pos));
             displacementData[y*terrainwidth+x] = tmp + 0.04f*layerdir*glm::perlin(glm::vec2(30.0f*glm::dot(layernorm, tmp), 0.5f));
         }
+    }
 
      // texture handle
     GLuint displacement;
@@ -311,27 +296,29 @@ int main()
     glm::vec3 position;
     glm::mat4 rotation = glm::mat4(1.0f);
     
-    running = true;
     float t = glfwGetTime();
     bool tessellation = true;
     bool space_down = false;
     
-    // mouse position
-    int mousex, mousey;
-    glfwGetMousePos(&mousex, &mousey);
-    
     glEnable(GL_DEPTH_TEST);
     
-    while(running)
-    {    
+    // disable mouse cursor
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    
+    // mouse position
+    double mousex, mousey;
+    glfwGetCursorPos(window, &mousex, &mousey);
+    while(!glfwWindowShouldClose(window)) {
+        glfwPollEvents();
+            
            // calculate timestep
         float new_t = glfwGetTime();
         float dt = new_t - t;
         t = new_t;
 
         // update mouse differential
-        int tmpx, tmpy;
-        glfwGetMousePos(&tmpx, &tmpy);
+        double tmpx, tmpy;
+        glfwGetCursorPos(window, &tmpx, &tmpy);
         glm::vec2 mousediff(tmpx-mousex, tmpy-mousey);
         mousex = tmpx;
         mousey = tmpy;
@@ -347,46 +334,40 @@ int main()
         rotation = glm::rotate(rotation,  0.2f*mousediff.y, right);
         
         // roll
-        if(glfwGetKey('Q'))
-        {
+        if(glfwGetKey(window, 'Q')) {
             rotation = glm::rotate(rotation, 180.0f*dt, forward); 
         }  
-        if(glfwGetKey('E'))
-        {
+        if(glfwGetKey(window, 'E')) {
             rotation = glm::rotate(rotation,-180.0f*dt, forward); 
         }
         
         float speed = 0.1f;
         // movement
-        if(glfwGetKey('W'))
-        {
+        if(glfwGetKey(window, 'W')) {
             position += speed*dt*forward; 
         }  
-        if(glfwGetKey('S'))
-        {
+        if(glfwGetKey(window, 'S')) {
             position -= speed*dt*forward;
         }
-        if(glfwGetKey('D'))
-        {
+        if(glfwGetKey(window, 'D')) {
             position += speed*dt*right; 
         }  
-        if(glfwGetKey('A'))
-        {
+        if(glfwGetKey(window, 'A')) {
             position -= speed*dt*right;
         }
-        
-        // terminate on escape 
-        if(glfwGetKey(GLFW_KEY_ESC))
-        {
-            running = false;
+
+        if(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT)) {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        } else {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
+
         
         // toggle tesselation
-        if(glfwGetKey(GLFW_KEY_SPACE) && !space_down)
-        {
+        if(glfwGetKey(window, GLFW_KEY_SPACE) && !space_down) {
             tessellation = !tessellation;
         }
-        space_down = glfwGetKey(GLFW_KEY_SPACE);
+        space_down = glfwGetKey(window, GLFW_KEY_SPACE);
         
         // calculate ViewProjection matrix
         glm::mat4 Projection = glm::perspective(60.0f, float(width) / height, 0.001f, 10.f);
@@ -406,10 +387,11 @@ int main()
         glUniformMatrix4fv(ViewProjection_Location, 1, GL_FALSE, glm::value_ptr(ViewProjection));
         glUniform3fv(ViewPosition_Location, 1, glm::value_ptr(position));
         
-        if(tessellation)
+        if(tessellation) {
             glUniform1f(tess_scale_Location, 1.0f);
-        else
+        } else {
             glUniform1f(tess_scale_Location, 0.0f);
+        }
         
         // set texture uniform
         glUniform1i(displacement_Location, 0);
@@ -419,14 +401,13 @@ int main()
         
         // check for errors
         GLenum error = glGetError();
-        if(error != GL_NO_ERROR)
-        {
-            std::cerr << gluErrorString(error);
-            running = false;       
+        if(error != GL_NO_ERROR) {
+            std::cerr << error << std::endl;
+            break;
         }
         
         // finally swap buffers
-        glfwSwapBuffers();       
+        glfwSwapBuffers(window);        
     }
 
     // delete the created objects
@@ -442,7 +423,7 @@ int main()
     glDeleteShader(fragment_shader);
     glDeleteProgram(shader_program);
     
-    glfwCloseWindow();
+    glfwDestroyWindow(window);
     glfwTerminate();
     return 0;
 }

@@ -11,8 +11,8 @@
  * line  465: compute shader invocations
  */
  
-#include <GL3/gl3w.h>
-#include <GL/glfw.h>
+#include <GL/gl3w.h>
+#include <GLFW/glfw3.h>
 
 //glm is used to create perspective and transform matrices
 #define GLM_SWIZZLE
@@ -26,22 +26,12 @@
 #include <cstdlib>
 #include <cmath>
 
-bool running;
-
-// window close callback function
-int closedWindow()
-{
-    running = false;
-    return GL_TRUE;
-}
 
 // helper to check and display for shader compiler errors
-bool check_shader_compile_status(GLuint obj)
-{
+bool check_shader_compile_status(GLuint obj) {
     GLint status;
     glGetShaderiv(obj, GL_COMPILE_STATUS, &status);
-    if(status == GL_FALSE)
-    {
+    if(status == GL_FALSE) {
         GLint length;
         glGetShaderiv(obj, GL_INFO_LOG_LENGTH, &length);
         std::vector<char> log(length);
@@ -53,12 +43,10 @@ bool check_shader_compile_status(GLuint obj)
 }
 
 // helper to check and display for shader linker error
-bool check_program_link_status(GLuint obj)
-{
+bool check_program_link_status(GLuint obj) {
     GLint status;
     glGetProgramiv(obj, GL_LINK_STATUS, &status);
-    if(status == GL_FALSE)
-    {
+    if(status == GL_FALSE) {
         GLint length;
         glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &length);
         std::vector<char> log(length);
@@ -69,37 +57,33 @@ bool check_program_link_status(GLuint obj)
     return true;
 }
 
-int main()
-{
+int main() {
     int width = 640;
     int height = 480;
     
-    if(glfwInit() == GL_FALSE)
-    {
+    if(glfwInit() == GL_FALSE) {
         std::cerr << "failed to init GLFW" << std::endl;
         return 1;
-    } 
-    glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 4);
-    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 3);
+    }
+
+    // select opengl version
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
  
     // create a window
-    if(glfwOpenWindow(width, height, 0, 0, 0, 8, 24, 8, GLFW_WINDOW) == GL_FALSE)
-    {
+    GLFWwindow *window;
+    if((window = glfwCreateWindow(width, height, "00skeleton", 0, 0)) == 0) {
         std::cerr << "failed to open window" << std::endl;
         glfwTerminate();
         return 1;
     }
     
-    // setup windows close callback
-    glfwSetWindowCloseCallback(closedWindow);
-    
-    glfwSwapInterval(0);
-    
-    if (gl3wInit())
-    {
+    glfwMakeContextCurrent(window);
+
+    if(gl3wInit()) {
         std::cerr << "failed to init GL3W" << std::endl;
-        glfwCloseWindow();
+        glfwDestroyWindow(window);
         glfwTerminate();
         return 1;
     }
@@ -161,8 +145,9 @@ int main()
     length = vertex_source.size();
     glShaderSource(vertex_shader, 1, &source, &length); 
     glCompileShader(vertex_shader);
-    if(!check_shader_compile_status(vertex_shader))
-    {
+    if(!check_shader_compile_status(vertex_shader)) {
+        glfwDestroyWindow(window);
+        glfwTerminate();
         return 1;
     }
     
@@ -172,8 +157,9 @@ int main()
     length = geometry_source.size();
     glShaderSource(geometry_shader, 1, &source, &length); 
     glCompileShader(geometry_shader);
-    if(!check_shader_compile_status(geometry_shader))
-    {
+    if(!check_shader_compile_status(geometry_shader)) {
+        glfwDestroyWindow(window);
+        glfwTerminate();
         return 1;
     }
  
@@ -183,8 +169,9 @@ int main()
     length = fragment_source.size();
     glShaderSource(fragment_shader, 1, &source, &length);   
     glCompileShader(fragment_shader);
-    if(!check_shader_compile_status(fragment_shader))
-    {
+    if(!check_shader_compile_status(fragment_shader)) {
+        glfwDestroyWindow(window);
+        glfwTerminate();
         return 1;
     }
     
@@ -234,8 +221,9 @@ int main()
     length = acceleration_source.size();
     glShaderSource(acceleration_shader, 1, &source, &length); 
     glCompileShader(acceleration_shader);
-    if(!check_shader_compile_status(acceleration_shader))
-    {
+    if(!check_shader_compile_status(acceleration_shader)) {
+        glfwDestroyWindow(window);
+        glfwTerminate();
         return 1;
     }
 
@@ -291,8 +279,9 @@ int main()
     length = tiled_acceleration_source.size();
     glShaderSource(tiled_acceleration_shader, 1, &source, &length); 
     glCompileShader(tiled_acceleration_shader);
-    if(!check_shader_compile_status(tiled_acceleration_shader))
-    {
+    if(!check_shader_compile_status(tiled_acceleration_shader)) {
+        glfwDestroyWindow(window);
+        glfwTerminate();
         return 1;
     }
 
@@ -332,8 +321,9 @@ int main()
     length = integrate_source.size();
     glShaderSource(integrate_shader, 1, &source, &length); 
     glCompileShader(integrate_shader);
-    if(!check_shader_compile_status(integrate_shader))
-    {
+    if(!check_shader_compile_status(integrate_shader)) {
+        glfwDestroyWindow(window);
+        glfwTerminate();
         return 1;
     }
 
@@ -353,8 +343,7 @@ int main()
     // randomly place particles in a cube
     std::vector<glm::vec4> positionData(particles);
     std::vector<glm::vec4> velocityData(particles);
-    for(int i = 0;i<particles;++i)
-    {
+    for(int i = 0;i<particles;++i) {
         // initial position
         positionData[i] = glm::vec4(
                                 1.5f-(float(std::rand())/RAND_MAX+float(std::rand())/RAND_MAX+float(std::rand())/RAND_MAX),
@@ -382,9 +371,6 @@ int main()
     // set up generic attrib pointers
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4*sizeof(GLfloat), (char*)0 + 0*sizeof(GLfloat));
-
-    // "unbind" vao
-    glBindVertexArray(0);
     
     glm::vec4 zero(0,0,0,0);
     
@@ -392,9 +378,6 @@ int main()
     glBindBuffer(GL_TEXTURE_BUFFER, velocities_vbo);
     glBufferData(GL_TEXTURE_BUFFER, sizeof(glm::vec4)*particles,  &velocityData[0], GL_STATIC_DRAW);                  
  
- 
-
-
     // texture handle
     GLuint positions_texture, velocities_texture;
     
@@ -442,33 +425,23 @@ int main()
 
     bool tiled = false;
     bool space_down = false;
-    
-    running = true;
-    while(running)
-    {   
-        // terminate on escape 
-        if(glfwGetKey(GLFW_KEY_ESC))
-        {
-            running = false;
-        }
+        
+    while(!glfwWindowShouldClose(window)) {
+        glfwPollEvents();
         
         // toggle occlusion culling
-        if(glfwGetKey(GLFW_KEY_SPACE) && !space_down)
-        {
+        if(glfwGetKey(window, GLFW_KEY_SPACE) && !space_down) {
             tiled = !tiled;
         }
-        space_down = glfwGetKey(GLFW_KEY_SPACE);
+        space_down = glfwGetKey(window, GLFW_KEY_SPACE);
         
         
         glBeginQuery(GL_TIME_ELAPSED, query);
         
-        if(tiled)
-        {
+        if(tiled) {
             glUseProgram(tiled_acceleration_program);
             glDispatchCompute(particles/256, 1, 1);
-        }
-        else
-        {
+        } else {
             glUseProgram(acceleration_program);
             glDispatchCompute(particles/256, 1, 1);
         }
@@ -506,14 +479,13 @@ int main()
        
         // check for errors
         GLenum error = glGetError();
-        if(error != GL_NO_ERROR)
-        {
-            std::cerr << gluErrorString(error);
-            running = false;       
+        if(error != GL_NO_ERROR) {
+            std::cerr << error << std::endl;
+            break;
         }
         
         // finally swap buffers
-        glfwSwapBuffers();
+        glfwSwapBuffers(window); 
         
         {
             GLuint64 result;
@@ -542,7 +514,7 @@ int main()
     glDeleteShader(acceleration_shader);
     glDeleteProgram(acceleration_program);
     
-    glfwCloseWindow();
+    glfwDestroyWindow(window);
     glfwTerminate();
     return 0;
 }

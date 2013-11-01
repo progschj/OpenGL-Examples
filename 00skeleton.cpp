@@ -1,97 +1,76 @@
 /* OpenGL example code - Skeleton
- * 
+ *
  * Skeleton code that all the other examples are based on
- * 
+ *
  * Autor: Jakob Progsch
  */
- 
+
 /* index
- * line   34: glfw initialization
- * line   56: glew initialization    
- * line   68: main loop    
- * line   92: cleanup
+ * line   24: glfw initialization
+ * line   44: gl3w initialization
+ * line   54: main loop
+ * line   69: cleanup
  */
 
-#include <GL3/gl3w.h>
-#include <GL/glfw.h>
+#include <GL/gl3w.h>
+#include <GLFW/glfw3.h>
 
 #include <iostream>
 
-bool running;
-
-// window close callback function
-int closedWindow()
-{
-    running = false;
-    return GL_TRUE;
-}
-
-int main()
-{
+int main() {
     int width = 640;
     int height = 480;
-    
-    if(glfwInit() == GL_FALSE)
-    {
+
+    if(glfwInit() == GL_FALSE) {
         std::cerr << "failed to init GLFW" << std::endl;
         return 1;
     }
 
-    // select opengl version 
-    glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3);
-    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 3);
- 
+    // select opengl version
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+
     // create a window
-    if(glfwOpenWindow(width, height, 0, 0, 0, 8, 24, 8, GLFW_WINDOW) == GL_FALSE)
-    {
+    GLFWwindow *window;
+    if((window = glfwCreateWindow(width, height, "00skeleton", 0, 0)) == 0) {
         std::cerr << "failed to open window" << std::endl;
         glfwTerminate();
         return 1;
     }
     
-    // setup windows close callback
-    glfwSetWindowCloseCallback(closedWindow);
+    glfwMakeContextCurrent(window);
 
-    
-    
-    if (gl3wInit())
-    {
+    if(gl3wInit()) {
         std::cerr << "failed to init GL3W" << std::endl;
-        glfwCloseWindow();
+        glfwDestroyWindow(window);
         glfwTerminate();
         return 1;
     }
-    
-    // creation and initialization of stuff goes here
 
-    running = true;
-    while(running)
-    {    
-        // terminate on escape 
-        if(glfwGetKey(GLFW_KEY_ESC))
-        {
-            running = false;
-        }
-        
+    // creation and initialization of stuff goes here
+    // ...
+
+    while(!glfwWindowShouldClose(window)) {
+        glfwPollEvents();
+
         // drawing etc goes here
         // ...
-       
+
         // check for errors
         GLenum error = glGetError();
-        if(error != GL_NO_ERROR)
-        {
-            std::cerr << gluErrorString(error);
-            running = false;       
+        if(error != GL_NO_ERROR) {
+            std::cerr << error << std::endl;
+            break;
         }
-        
+
         // finally swap buffers
-        glfwSwapBuffers();       
+        glfwSwapBuffers(window);
     }
 
-
-    glfwCloseWindow();
+    glfwDestroyWindow(window);
     glfwTerminate();
+
     return 0;
 }
 

@@ -1,22 +1,22 @@
 cmake_minimum_required(VERSION 2.6)
- 
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules")
- 
+  
 project(OPENGLEXAMPLES)
 
 option(BUILD_OGL43 "Bild OpenGL 4.3 examples" OFF)
 mark_as_advanced(BUILD_OGL43)
- 
+
 find_package(OpenGL REQUIRED)
-find_package(GLFW REQUIRED)
-#find_package(GLEW REQUIRED)
+
+add_subdirectory(glfw)
+
+include_directories(glfw/include)
+ 
 set(GL3W_LIBRARY "-lgl3w") 
 
 set(CMAKE_CXX_FLAGS "-O2 -Wall -Wextra")
-SET(LIBRARIES ${GLFW_LIBRARY} ${GL3W_LIBRARY} ${OPENGL_LIBRARY})
+SET(LIBRARIES glfw ${GLFW_LIBRARIES} ${GL3W_LIBRARY} ${OPENGL_LIBRARY})
 
 link_directories (${OPENGLEXAMPLES_BINARY_DIR}/bin)
-
  
 add_executable (00skeleton 00skeleton.cpp)
 target_link_libraries(00skeleton ${LIBRARIES} )
@@ -66,7 +66,5 @@ target_link_libraries(11tesselation ${LIBRARIES} )
 add_executable (12shader_image_load_store 12shader_image_load_store.cpp)
 target_link_libraries(12shader_image_load_store ${LIBRARIES} )
 
-if(BUILD_OGL43)
-    add_executable (13compute_shader_nbody 13compute_shader_nbody.cpp)
-    target_link_libraries(13compute_shader_nbody ${LIBRARIES} )
-endif()
+add_executable (13compute_shader_nbody 13compute_shader_nbody.cpp)
+target_link_libraries(13compute_shader_nbody ${LIBRARIES} )

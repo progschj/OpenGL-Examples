@@ -24,8 +24,8 @@
  * line  674: end timer query and handle results
  */
 
-#include <GL3/gl3w.h>
-#include <GL/glfw.h>
+#include <GL/gl3w.h>
+#include <GLFW/glfw3.h>
 
 //glm is used to create perspective and transform matrices
 #include <glm/glm.hpp>
@@ -52,8 +52,7 @@ struct Chunk {
 class DistancePred {
 public:
     DistancePred(glm::vec3 p) : pos(p) { }
-    bool operator()(const Chunk &a, const Chunk &b)
-    {
+    bool operator()(const Chunk &a, const Chunk &b) {
         return glm::distance(pos, a.center) < glm::distance(pos, b.center);
     }
 private:
@@ -61,27 +60,16 @@ private:
 };
 
 // world function that defines the voxel data
-float world_function(glm::vec3 pos)
-{
+float world_function(glm::vec3 pos) {
     return glm::perlin(0.1f*(pos+glm::vec3(100,100,100)));
 }
 
-bool running;
-
-// window close callback function
-int closedWindow()
-{
-    running = false;
-    return GL_TRUE;
-}
 
 // helper to check and display for shader compiler errors
-bool check_shader_compile_status(GLuint obj)
-{
+bool check_shader_compile_status(GLuint obj) {
     GLint status;
     glGetShaderiv(obj, GL_COMPILE_STATUS, &status);
-    if(status == GL_FALSE)
-    {
+    if(status == GL_FALSE) {
         GLint length;
         glGetShaderiv(obj, GL_INFO_LOG_LENGTH, &length);
         std::vector<char> log(length);
@@ -93,12 +81,10 @@ bool check_shader_compile_status(GLuint obj)
 }
 
 // helper to check and display for shader linker error
-bool check_program_link_status(GLuint obj)
-{
+bool check_program_link_status(GLuint obj) {
     GLint status;
     glGetProgramiv(obj, GL_LINK_STATUS, &status);
-    if(status == GL_FALSE)
-    {
+    if(status == GL_FALSE) {
         GLint length;
         glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &length);
         std::vector<char> log(length);
@@ -109,47 +95,37 @@ bool check_program_link_status(GLuint obj)
     return true;
 }
 
-int main()
-{
+int main() {
     int width = 640;
     int height = 480;
     
-    if(glfwInit() == GL_FALSE)
-    {
+    if(glfwInit() == GL_FALSE) {
         std::cerr << "failed to init GLFW" << std::endl;
         return 1;
     }
 
-    // select opengl version 
-    glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3);
-    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 3);
+    // select opengl version
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
  
     // create a window
-    if(glfwOpenWindow(width, height, 0, 0, 0, 8, 24, 8, GLFW_WINDOW) == GL_FALSE)
-    {
+    GLFWwindow *window;
+    if((window = glfwCreateWindow(width, height, "00skeleton", 0, 0)) == 0) {
         std::cerr << "failed to open window" << std::endl;
         glfwTerminate();
         return 1;
     }
     
-    // setup windows close callback
-    glfwSetWindowCloseCallback(closedWindow);
-    
-    // this time we disable the mouse cursor since we want differential
-    // mouse input
-    glfwDisable(GLFW_MOUSE_CURSOR);
-    
-    
-    
-    if (gl3wInit())
-    {
+    glfwMakeContextCurrent(window);
+
+    if(gl3wInit()) {
         std::cerr << "failed to init GL3W" << std::endl;
-        glfwCloseWindow();
+        glfwDestroyWindow(window);
         glfwTerminate();
         return 1;
     }
-
+    
     // draw shader
     std::string vertex_source =
         "#version 330\n"
@@ -185,8 +161,9 @@ int main()
     length = vertex_source.size();
     glShaderSource(vertex_shader, 1, &source, &length); 
     glCompileShader(vertex_shader);
-    if(!check_shader_compile_status(vertex_shader))
-    {
+    if(!check_shader_compile_status(vertex_shader)) {
+        glfwDestroyWindow(window);
+        glfwTerminate();
         return 1;
     }
  
@@ -196,8 +173,9 @@ int main()
     length = fragment_source.size();
     glShaderSource(fragment_shader, 1, &source, &length);   
     glCompileShader(fragment_shader);
-    if(!check_shader_compile_status(fragment_shader))
-    {
+    if(!check_shader_compile_status(fragment_shader)) {
+        glfwDestroyWindow(window);
+        glfwTerminate();
         return 1;
     }
     
@@ -239,8 +217,9 @@ int main()
     length = query_vertex_source.size();
     glShaderSource(query_vertex_shader, 1, &source, &length); 
     glCompileShader(query_vertex_shader);
-    if(!check_shader_compile_status(query_vertex_shader))
-    {
+    if(!check_shader_compile_status(query_vertex_shader)) {
+        glfwDestroyWindow(window);
+        glfwTerminate();
         return 1;
     }
  
@@ -250,8 +229,9 @@ int main()
     length = query_fragment_source.size();
     glShaderSource(query_fragment_shader, 1, &source, &length);   
     glCompileShader(query_fragment_shader);
-    if(!check_shader_compile_status(query_fragment_shader))
-    {
+    if(!check_shader_compile_status(query_fragment_shader)) {
+        glfwDestroyWindow(window);
+        glfwTerminate();
         return 1;
     }
     
@@ -269,7 +249,6 @@ int main()
     // obtain location of projection uniform
     GLint QueryViewProjection_location = glGetUniformLocation(query_shader_program, "ViewProjection");
 
-
     // chunk container and chunk parameters
     std::vector<Chunk> chunks;
     int chunkrange = 4;
@@ -281,9 +260,7 @@ int main()
     // iterate over all chunks we want to extract        
     for(int i = -chunkrange;i<chunkrange;++i)
         for(int j = -chunkrange;j<chunkrange;++j)
-            for(int k = -chunkrange;k<chunkrange;++k)
-    {
-        
+            for(int k = -chunkrange;k<chunkrange;++k) {
         Chunk chunk;
         
         // chunk data
@@ -300,16 +277,13 @@ int main()
         glm::vec3 offset = static_cast<float>(chunksize) * glm::vec3(i,j,k);
         float threshold = 0.0f;
         // iterate over all blocks within the chunk
-        for(int x = 0;x<chunksize;++x)
-            for(int y = 0;y<chunksize;++y)
-                for(int z = 0;z<chunksize;++z)
-                {
+        for(int x = 0;x<chunksize;++x) {
+            for(int y = 0;y<chunksize;++y)  {
+                for(int z = 0;z<chunksize;++z) {
                     glm::vec3 pos = glm::vec3(x,y,z) + offset;
                     // insert quads if current block is solid and neighbors are not
-                    if(world_function(pos)<threshold)
-                    {
-                        if(world_function(pos+glm::vec3(1,0,0))>=threshold)
-                        {
+                    if(world_function(pos)<threshold) {
+                        if(world_function(pos+glm::vec3(1,0,0))>=threshold) {
                             vertexData.push_back(pos+0.5f*glm::vec3( 1, 1, 1));
                             vertexData.push_back(glm::vec3( 1, 0, 0));
                             vertexData.push_back(pos+0.5f*glm::vec3( 1,-1, 1));
@@ -319,8 +293,7 @@ int main()
                             vertexData.push_back(pos+0.5f*glm::vec3( 1,-1,-1));
                             vertexData.push_back(glm::vec3( 1, 0, 0));
                         }
-                        if(world_function(pos+glm::vec3(0,1,0))>=threshold)
-                        {
+                        if(world_function(pos+glm::vec3(0,1,0))>=threshold) {
                             vertexData.push_back(pos+0.5f*glm::vec3( 1, 1, 1));
                             vertexData.push_back(glm::vec3( 0, 1, 0));
                             vertexData.push_back(pos+0.5f*glm::vec3( 1, 1,-1));
@@ -330,8 +303,7 @@ int main()
                             vertexData.push_back(pos+0.5f*glm::vec3(-1, 1,-1));
                             vertexData.push_back(glm::vec3( 0, 1, 0));
                         }
-                        if(world_function(pos+glm::vec3(0,0,1))>=threshold)
-                        {
+                        if(world_function(pos+glm::vec3(0,0,1))>=threshold) {
                             vertexData.push_back(pos+0.5f*glm::vec3( 1, 1, 1));
                             vertexData.push_back(glm::vec3( 0, 0, 1));
                             vertexData.push_back(pos+0.5f*glm::vec3(-1, 1, 1));
@@ -341,8 +313,7 @@ int main()
                             vertexData.push_back(pos+0.5f*glm::vec3(-1,-1, 1));
                             vertexData.push_back(glm::vec3( 0, 0, 1));
                         }
-                        if(world_function(pos-glm::vec3(1,0,0))>=threshold)
-                        {
+                        if(world_function(pos-glm::vec3(1,0,0))>=threshold) {
                             vertexData.push_back(pos+0.5f*glm::vec3(-1, 1, 1));
                             vertexData.push_back(glm::vec3(-1, 0, 0));
                             vertexData.push_back(pos+0.5f*glm::vec3(-1, 1,-1));
@@ -352,8 +323,7 @@ int main()
                             vertexData.push_back(pos+0.5f*glm::vec3(-1,-1,-1));
                             vertexData.push_back(glm::vec3(-1, 0, 0));
                         }
-                        if(world_function(pos-glm::vec3(0,1,0))>=threshold)
-                        {
+                        if(world_function(pos-glm::vec3(0,1,0))>=threshold) {
                             vertexData.push_back(pos+0.5f*glm::vec3( 1,-1, 1));
                             vertexData.push_back(glm::vec3( 0,-1, 0));
                             vertexData.push_back(pos+0.5f*glm::vec3(-1,-1, 1));
@@ -363,8 +333,7 @@ int main()
                             vertexData.push_back(pos+0.5f*glm::vec3(-1,-1,-1));
                             vertexData.push_back(glm::vec3( 0,-1, 0));
                         }
-                        if(world_function(pos-glm::vec3(0,0,1))>=threshold)
-                        {
+                        if(world_function(pos-glm::vec3(0,0,1))>=threshold) {
                             vertexData.push_back(pos+0.5f*glm::vec3( 1, 1,-1));
                             vertexData.push_back(glm::vec3( 0, 0,-1));
                             vertexData.push_back(pos+0.5f*glm::vec3( 1,-1,-1));
@@ -376,10 +345,11 @@ int main()
                         }
                     }
                 }
+            }
+        }
         // upload
         glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3)*vertexData.size(), &vertexData[0], GL_STATIC_DRAW);
                         
-               
         // set up generic attrib pointers
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (char*)0 + 0*sizeof(GLfloat));
@@ -387,15 +357,13 @@ int main()
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (char*)0 + 3*sizeof(GLfloat));
         
-        
         // generate and bind the index buffer object
         glGenBuffers(1, &chunk.ibo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, chunk.ibo);
         
         chunk.quadcount = vertexData.size()/8;
         std::vector<GLuint> indexData(6*chunk.quadcount);
-        for(int i = 0;i<chunk.quadcount;++i)
-        {
+        for(int i = 0;i<chunk.quadcount;++i) {
             indexData[6*i + 0] = 4*i + 0;
             indexData[6*i + 1] = 4*i + 1;
             indexData[6*i + 2] = 4*i + 2;
@@ -407,9 +375,7 @@ int main()
         // upload
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*indexData.size(), &indexData[0], GL_STATIC_DRAW);
 
-
         // chunk bounding box
-
         // generate and bind the vao
         glGenVertexArrays(1, &chunk.bounding_vao);
         glBindVertexArray(chunk.bounding_vao);
@@ -487,9 +453,6 @@ int main()
         // add to container
         chunks.push_back(chunk);
     }
-    
-    // "unbind" vao
-    glBindVertexArray(0);
 
     // timer query setup
     // use multiple queries to avoid stalling on getting the results
@@ -505,24 +468,27 @@ int main()
     glm::vec3 position;
     glm::mat4 rotation = glm::mat4(1.0f);
     
-    running = true;
     float t = glfwGetTime();
     bool occlusion_cull = true;
     bool space_down = false;
     
+    // disable mouse cursor
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    
     // mouse position
-    int mousex, mousey;
-    glfwGetMousePos(&mousex, &mousey);
-    while(running)
-    {   
+    double mousex, mousey;
+    glfwGetCursorPos(window, &mousex, &mousey);
+    while(!glfwWindowShouldClose(window)) {
+        glfwPollEvents();
+
         // calculate timestep
         float new_t = glfwGetTime();
         float dt = new_t - t;
         t = new_t;
 
         // update mouse differential
-        int tmpx, tmpy;
-        glfwGetMousePos(&tmpx, &tmpy);
+        double tmpx, tmpy;
+        glfwGetCursorPos(window, &tmpx, &tmpy);
         glm::vec2 mousediff(tmpx-mousex, tmpy-mousey);
         mousex = tmpx;
         mousey = tmpy;
@@ -538,52 +504,37 @@ int main()
         rotation = glm::rotate(rotation,  0.2f*mousediff.y, right);
         
         // roll
-        if(glfwGetKey('Q'))
-        {
+        if(glfwGetKey(window, 'Q')) {
             rotation = glm::rotate(rotation, 180.0f*dt, forward); 
         }  
-        if(glfwGetKey('E'))
-        {
+        if(glfwGetKey(window, 'E')) {
             rotation = glm::rotate(rotation,-180.0f*dt, forward); 
         }
         
         // movement
-        if(glfwGetKey('W'))
-        {
+        if(glfwGetKey(window, 'W')) {
             position += 10.0f*dt*forward; 
         }  
-        if(glfwGetKey('S'))
-        {
+        if(glfwGetKey(window, 'S')) {
             position -= 10.0f*dt*forward;
         }
-        if(glfwGetKey('D'))
-        {
+        if(glfwGetKey(window, 'D')) {
             position += 10.0f*dt*right; 
         }  
-        if(glfwGetKey('A'))
-        {
+        if(glfwGetKey(window, 'A')) {
             position -= 10.0f*dt*right;
         }
         
         // toggle occlusion culling
-        if(glfwGetKey(GLFW_KEY_SPACE) && !space_down)
-        {
+        if(glfwGetKey(window, GLFW_KEY_SPACE) && !space_down) {
             occlusion_cull = !occlusion_cull;
         }
-        space_down = glfwGetKey(GLFW_KEY_SPACE);
-        
-        // terminate on escape 
-        if(glfwGetKey(GLFW_KEY_ESC))
-        {
-            running = false;
-        }
-        
-        
+        space_down = glfwGetKey(window, GLFW_KEY_SPACE);
+
         // calculate ViewProjection matrix
         glm::mat4 Projection = glm::perspective(90.0f, 4.0f / 3.0f, 0.1f, 200.f);
         glm::mat4 View = rotation*glm::translate(glm::mat4(1.0f), -position);
         glm::mat4 ViewProjection = Projection*View;
-
 
         // set matrices for both shaders
         glUseProgram(query_shader_program);
@@ -607,11 +558,9 @@ int main()
         glBeginQuery(GL_TIME_ELAPSED, queries[current_query]);
         
         // peel chunks
-        while(i!=chunks.size())
-        {
+        while(i!=chunks.size()) {
             size_t j = i;
-            if(occlusion_cull)
-            {
+            if(occlusion_cull) {
                 // start occlusion queries and render for the current slice
                 glDisable(GL_CULL_FACE);
                 
@@ -619,8 +568,7 @@ int main()
                 glDepthMask(GL_FALSE);
                 glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
                 glUseProgram(query_shader_program);
-                for(;j<chunks.size() && glm::distance(chunks[j].center, position)<maxdist;++j)
-                {
+                for(;j<chunks.size() && glm::distance(chunks[j].center, position)<maxdist;++j) {
                     // frustum culling
                     glm::vec4 projected = ViewProjection*glm::vec4(chunks[j].center,1);
                     if( (glm::distance(chunks[j].center,position) > chunksize) &&
@@ -647,8 +595,7 @@ int main()
             glDepthMask(GL_TRUE);
             glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
             glUseProgram(shader_program);
-            for(;j<chunks.size() && glm::distance(chunks[j].center, position)<maxdist;++j)
-            {
+            for(;j<chunks.size() && glm::distance(chunks[j].center, position)<maxdist;++j) {
                 // frustum culling
                 glm::vec4 projected = ViewProjection*glm::vec4(chunks[j].center,1);
                 if( (glm::distance(chunks[j].center,position) > chunksize) &&
@@ -675,8 +622,7 @@ int main()
         glEndQuery(GL_TIME_ELAPSED);
         
         // display timer query results from querycount frames before
-        if(GL_TRUE == glIsQuery(queries[(current_query+1)%querycount]))
-        {
+        if(GL_TRUE == glIsQuery(queries[(current_query+1)%querycount])) {
             GLuint64 result;
             glGetQueryObjectui64v(queries[(current_query+1)%querycount], GL_QUERY_RESULT, &result);
             std::cout << result*1.e-6 << " ms/frame" << std::endl;
@@ -686,20 +632,18 @@ int main()
         
         // check for errors
         GLenum error = glGetError();
-        if(error != GL_NO_ERROR)
-        {
-            std::cerr << gluErrorString(error);
-            running = false;       
+        if(error != GL_NO_ERROR) {
+            std::cerr << error << std::endl;
+            break;
         }
         
         // finally swap buffers
-        glfwSwapBuffers();       
+        glfwSwapBuffers(window);        
     }
     
     // delete the created objects
     
-    for(size_t i = 0;i<chunks.size();++i)
-    {    
+    for(size_t i = 0;i<chunks.size();++i) {    
         glDeleteVertexArrays(1, &chunks[i].vao);
         glDeleteBuffers(1, &chunks[i].vbo);
         glDeleteBuffers(1, &chunks[i].ibo);
@@ -723,7 +667,7 @@ int main()
     glDeleteShader(query_fragment_shader);
     glDeleteProgram(query_shader_program);
     
-    glfwCloseWindow();
+    glfwDestroyWindow(window);
     glfwTerminate();
     return 0;
 }

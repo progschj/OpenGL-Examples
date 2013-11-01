@@ -12,29 +12,18 @@
  * line  267: draw call
  */
 
-#include <GL3/gl3w.h>
-#include <GL/glfw.h>
+#include <GL/gl3w.h>
+#include <GLFW/glfw3.h>
 
 #include <iostream>
 #include <string>
 #include <vector>
 
-bool running;
-
-// window close callback function
-int closedWindow()
-{
-    running = false;
-    return GL_TRUE;
-}
-
 // helper to check and display for shader compiler errors
-bool check_shader_compile_status(GLuint obj)
-{
+bool check_shader_compile_status(GLuint obj) {
     GLint status;
     glGetShaderiv(obj, GL_COMPILE_STATUS, &status);
-    if(status == GL_FALSE)
-    {
+    if(status == GL_FALSE) {
         GLint length;
         glGetShaderiv(obj, GL_INFO_LOG_LENGTH, &length);
         std::vector<char> log(length);
@@ -46,12 +35,10 @@ bool check_shader_compile_status(GLuint obj)
 }
 
 // helper to check and display for shader linker error
-bool check_program_link_status(GLuint obj)
-{
+bool check_program_link_status(GLuint obj) {
     GLint status;
     glGetProgramiv(obj, GL_LINK_STATUS, &status);
-    if(status == GL_FALSE)
-    {
+    if(status == GL_FALSE) {
         GLint length;
         glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &length);
         std::vector<char> log(length);
@@ -62,43 +49,37 @@ bool check_program_link_status(GLuint obj)
     return true;
 }
 
-int main()
-{
+int main() {
     int width = 640;
     int height = 480;
     
-    if(glfwInit() == GL_FALSE)
-    {
+    if(glfwInit() == GL_FALSE) {
         std::cerr << "failed to init GLFW" << std::endl;
         return 1;
     }
 
-    // select opengl version 
-    glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3);
-    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 3);
+    // select opengl version
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
  
     // create a window
-    if(glfwOpenWindow(width, height, 0, 0, 0, 8, 24, 8, GLFW_WINDOW) == GL_FALSE)
-    {
+    GLFWwindow *window;
+    if((window = glfwCreateWindow(width, height, "00skeleton", 0, 0)) == 0) {
         std::cerr << "failed to open window" << std::endl;
         glfwTerminate();
         return 1;
     }
     
-    // setup windows close callback
-    glfwSetWindowCloseCallback(closedWindow);
-    
-    
-    
-    if (gl3wInit())
-    {
+    glfwMakeContextCurrent(window);
+
+    if(gl3wInit()) {
         std::cerr << "failed to init GL3W" << std::endl;
-        glfwCloseWindow();
+        glfwDestroyWindow(window);
         glfwTerminate();
         return 1;
     }
-
+    
     // shader source code
     std::string vertex_source =
         "#version 330\n"
@@ -132,8 +113,9 @@ int main()
     length = vertex_source.size();
     glShaderSource(vertex_shader, 1, &source, &length); 
     glCompileShader(vertex_shader);
-    if(!check_shader_compile_status(vertex_shader))
-    {
+    if(!check_shader_compile_status(vertex_shader)) {
+        glfwDestroyWindow(window);
+        glfwTerminate();
         return 1;
     }
  
@@ -143,11 +125,12 @@ int main()
     length = fragment_source.size();
     glShaderSource(fragment_shader, 1, &source, &length);   
     glCompileShader(fragment_shader);
-    if(!check_shader_compile_status(fragment_shader))
-    {
+    if(!check_shader_compile_status(fragment_shader)) {
+        glfwDestroyWindow(window);
+        glfwTerminate();
         return 1;
     }
-    
+        
     // create program
     shader_program = glCreateProgram();
     
@@ -220,15 +203,15 @@ int main()
 
     // create some image data
     std::vector<GLubyte> image(4*width*height);
-    for(int j = 0;j<height;++j)
-        for(int i = 0;i<width;++i)
-        {
+    for(int j = 0;j<height;++j) {
+        for(int i = 0;i<width;++i) {
             size_t index = j*width + i;
             image[4*index + 0] = 0xFF*(j/10%2)*(i/10%2); // R
             image[4*index + 1] = 0xFF*(j/13%2)*(i/13%2); // G
             image[4*index + 2] = 0xFF*(j/17%2)*(i/17%2); // B
             image[4*index + 3] = 0xFF;                   // A
         }
+    }
     
     // set texture parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -239,14 +222,8 @@ int main()
     // set texture content
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &image[0]);
     
-    running = true;
-    while(running)
-    {    
-        // terminate on escape 
-        if(glfwGetKey(GLFW_KEY_ESC))
-        {
-            running = false;
-        }
+    while(!glfwWindowShouldClose(window)) {
+        glfwPollEvents();
         
         // clear first
         glClear(GL_COLOR_BUFFER_BIT);
@@ -269,14 +246,13 @@ int main()
        
         // check for errors
         GLenum error = glGetError();
-        if(error != GL_NO_ERROR)
-        {
-            std::cerr << gluErrorString(error);
-            running = false;       
+        if(error != GL_NO_ERROR) {
+            std::cerr << error << std::endl;
+            break;
         }
         
         // finally swap buffers
-        glfwSwapBuffers();       
+        glfwSwapBuffers(window);     
     }
     
     // delete the created objects
@@ -293,7 +269,7 @@ int main()
     glDeleteShader(fragment_shader);
     glDeleteProgram(shader_program);
 
-    glfwCloseWindow();
+    glfwDestroyWindow(window);
     glfwTerminate();
     return 0;
 }

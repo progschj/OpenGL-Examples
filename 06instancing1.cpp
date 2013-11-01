@@ -11,8 +11,8 @@
  * line  336: draw call
  */
  
-#include <GL3/gl3w.h>
-#include <GL/glfw.h>
+#include <GL/gl3w.h>
+#include <GLFW/glfw3.h>
  
 //glm is used to create perspective and transform matrices
 #include <glm/glm.hpp>
@@ -23,22 +23,11 @@
 #include <string>
 #include <vector>
  
-bool running;
- 
-// window close callback function
-int closedWindow()
-{
-    running = false;
-    return GL_TRUE;
-}
- 
 // helper to check and display for shader compiler errors
-bool check_shader_compile_status(GLuint obj)
-{
+bool check_shader_compile_status(GLuint obj) {
     GLint status;
     glGetShaderiv(obj, GL_COMPILE_STATUS, &status);
-    if(status == GL_FALSE)
-    {
+    if(status == GL_FALSE) {
         GLint length;
         glGetShaderiv(obj, GL_INFO_LOG_LENGTH, &length);
         std::vector<char> log(length);
@@ -48,14 +37,12 @@ bool check_shader_compile_status(GLuint obj)
     }
     return true;
 }
- 
+
 // helper to check and display for shader linker error
-bool check_program_link_status(GLuint obj)
-{
+bool check_program_link_status(GLuint obj) {
     GLint status;
     glGetProgramiv(obj, GL_LINK_STATUS, &status);
-    if(status == GL_FALSE)
-    {
+    if(status == GL_FALSE) {
         GLint length;
         glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &length);
         std::vector<char> log(length);
@@ -65,40 +52,34 @@ bool check_program_link_status(GLuint obj)
     }
     return true;
 }
- 
-int main()
-{
+
+int main() {
     int width = 640;
     int height = 480;
     
-    if(glfwInit() == GL_FALSE)
-    {
+    if(glfwInit() == GL_FALSE) {
         std::cerr << "failed to init GLFW" << std::endl;
         return 1;
     }
- 
-    // select opengl version 
-    glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3);
-    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 3);
+
+    // select opengl version
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
  
     // create a window
-    if(glfwOpenWindow(width, height, 0, 0, 0, 8, 24, 8, GLFW_WINDOW) == GL_FALSE)
-    {
+    GLFWwindow *window;
+    if((window = glfwCreateWindow(width, height, "00skeleton", 0, 0)) == 0) {
         std::cerr << "failed to open window" << std::endl;
         glfwTerminate();
         return 1;
     }
     
-    // setup windows close callback
-    glfwSetWindowCloseCallback(closedWindow);
-    
-    
-    
-    if (gl3wInit())
-    {
+    glfwMakeContextCurrent(window);
+
+    if(gl3wInit()) {
         std::cerr << "failed to init GL3W" << std::endl;
-        glfwCloseWindow();
+        glfwDestroyWindow(window);
         glfwTerminate();
         return 1;
     }
@@ -137,8 +118,9 @@ int main()
     length = vertex_source.size();
     glShaderSource(vertex_shader, 1, &source, &length); 
     glCompileShader(vertex_shader);
-    if(!check_shader_compile_status(vertex_shader))
-    {
+    if(!check_shader_compile_status(vertex_shader)) {
+        glfwDestroyWindow(window);
+        glfwTerminate();
         return 1;
     }
  
@@ -148,8 +130,9 @@ int main()
     length = fragment_source.size();
     glShaderSource(fragment_shader, 1, &source, &length);   
     glCompileShader(fragment_shader);
-    if(!check_shader_compile_status(fragment_shader))
-    {
+    if(!check_shader_compile_status(fragment_shader)) {
+        glfwDestroyWindow(window);
+        glfwTerminate();
         return 1;
     }
     
@@ -222,7 +205,6 @@ int main()
     // fill with data
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*6*4*6, vertexData, GL_STATIC_DRAW);
                     
-           
     // set up generic attrib pointers
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (char*)0 + 0*sizeof(GLfloat));
@@ -230,9 +212,6 @@ int main()
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(GLfloat), (char*)0 + 3*sizeof(GLfloat));
  
-    
-    
-    
     // generate and bind the index buffer object
     glGenBuffers(1, &ibo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
@@ -261,7 +240,6 @@ int main()
     // fill with data
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*6*2*3, indexData, GL_STATIC_DRAW);
     
-
     // generate and bind the vertex buffer object containing the
     // instance offsets
     glGenBuffers(1, &tbo);
@@ -289,26 +267,15 @@ int main()
     // a attrib divisor of 1 means that attribute 2 will advance once
     // every instance (0 would mean once per vertex) 
     glVertexAttribDivisor(2, 1);
-    
-    
-    // "unbind" vao
-    glBindVertexArray(0);
- 
-    
+
     // we are drawing 3d objects so we want depth testing
     glEnable(GL_DEPTH_TEST);
- 
-    running = true;
-    while(running)
-    {   
+     
+    while(!glfwWindowShouldClose(window)) {
+        glfwPollEvents();
+
         // get the time in seconds
         float t = glfwGetTime();
-        
-        // terminate on escape 
-        if(glfwGetKey(GLFW_KEY_ESC))
-        {
-            running = false;
-        }
         
         // clear first
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -339,14 +306,13 @@ int main()
        
         // check for errors
         GLenum error = glGetError();
-        if(error != GL_NO_ERROR)
-        {
-            std::cerr << gluErrorString(error);
-            running = false;       
+        if(error != GL_NO_ERROR) {
+            std::cerr << error << std::endl;
+            break;
         }
         
         // finally swap buffers
-        glfwSwapBuffers();       
+        glfwSwapBuffers(window);        
     }
     
     // delete the created objects
@@ -362,7 +328,7 @@ int main()
     glDeleteShader(fragment_shader);
     glDeleteProgram(shader_program);
     
-    glfwCloseWindow();
+    glfwDestroyWindow(window);
     glfwTerminate();
     return 0;
 }
