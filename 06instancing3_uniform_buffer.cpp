@@ -6,13 +6,6 @@
  * Autor: Jakob Progsch
  */
 
-/* index
- * line  111: uniform block in shader
- * line  171: setup uniform block binding and uniform buffer    
- * line  327: bind uniform block for drawing        
- * line  332: draw call       
- */
-
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 
@@ -72,7 +65,7 @@ int main() {
  
     // create a window
     GLFWwindow *window;
-    if((window = glfwCreateWindow(width, height, "00skeleton", 0, 0)) == 0) {
+    if((window = glfwCreateWindow(width, height, "06instancing3_uniform_buffer", 0, 0)) == 0) {
         std::cerr << "failed to open window" << std::endl;
         glfwTerminate();
         return 1;

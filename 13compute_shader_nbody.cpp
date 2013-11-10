@@ -4,12 +4,6 @@
  * 
  * Autor: Jakob Progsch
  */
-
-/* index
- * line  204: acceleration compute shader source
- * line  254: tiled acceleration compute shader source 
- * line  465: compute shader invocations
- */
  
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
@@ -73,7 +67,7 @@ int main() {
  
     // create a window
     GLFWwindow *window;
-    if((window = glfwCreateWindow(width, height, "00skeleton", 0, 0)) == 0) {
+    if((window = glfwCreateWindow(width, height, "13compute_shader_nbody", 0, 0)) == 0) {
         std::cerr << "failed to open window" << std::endl;
         glfwTerminate();
         return 1;
@@ -206,7 +200,7 @@ int main() {
         "   for(int i = 0;i<N;++i) {\n"
         "       vec3 other = imageLoad(positions, i).xyz;\n"
         "       vec3 diff = position - other;\n"
-        "       float dist = length(diff)+0.001;\n"
+        "       float dist = length(diff)+0.01;\n"
         "       acceleration -= 0.1*diff/(dist*dist*dist);\n"
         "   }\n"
         "   imageStore(velocities, index, vec4(velocity+dt*acceleration,0));\n"
@@ -261,7 +255,7 @@ int main() {
         "       for(int i = 0;i<gl_WorkGroupSize.x;++i) {\n"
         "           vec3 other = tmp[i].xyz;\n"
         "           vec3 diff = position - other;\n"
-        "           float invdist = 1/sqrt(dot(diff,diff)+0.00001);\n"
+        "           float invdist = 1.0/(length(diff)+0.01);\n"
         "           acceleration -= diff*0.1*invdist*invdist*invdist;\n"
         "       }\n"
         "       groupMemoryBarrier();\n"
@@ -338,7 +332,7 @@ int main() {
     check_program_link_status(integrate_program);   
    
    
-    const int particles = 16*1024;
+    const int particles = 8*1024;
 
     // randomly place particles in a cube
     std::vector<glm::vec4> positionData(particles);
@@ -352,7 +346,7 @@ int main() {
                                 0
                             );
         positionData[i] = glm::vec4(0.0f,0.0f,0.0f,1) + glm::vec4(4.0f,1.0f,4.0f,1)*positionData[i];
-        velocityData[i] = 40.0f*glm::vec4(glm::cross(glm::vec3(positionData[i].xyz()), glm::vec3(0,1,0)), 0)/glm::dot(glm::vec3(positionData[i].xyz()),glm::vec3(positionData[i].xyz()));
+        velocityData[i] = 28.0f*glm::vec4(glm::cross(glm::vec3(positionData[i].xyz()), glm::vec3(0,1,0)), 0)/glm::dot(glm::vec3(positionData[i].xyz()),glm::vec3(positionData[i].xyz()));
     }
     
     // generate positions_vbos and vaos
@@ -360,7 +354,6 @@ int main() {
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &positions_vbo);
     
-
     glBindVertexArray(vao);
         
     glBindBuffer(GL_ARRAY_BUFFER, positions_vbo);
@@ -434,7 +427,6 @@ int main() {
             tiled = !tiled;
         }
         space_down = glfwGetKey(window, GLFW_KEY_SPACE);
-        
         
         glBeginQuery(GL_TIME_ELAPSED, query);
         

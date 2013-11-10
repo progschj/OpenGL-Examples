@@ -10,17 +10,6 @@
  * 
  * Autor: Jakob Progsch
  */
- 
-/* index
- * line  122: vertex shader generates vertices from InstanceID/VertexID
- * line  139: tessellation control shader    
- * line  163: tessellation evaluation shader    
- * line  182: fragment shader with simple phong lighting        
- * line  202: shader compilation   
- * line  274: terrain generation
- * line  330: input handling        
- * line  415: draw call       
- */
 
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
@@ -83,7 +72,7 @@ int main() {
  
     // create a window
     GLFWwindow *window;
-    if((window = glfwCreateWindow(width, height, "00skeleton", 0, 0)) == 0) {
+    if((window = glfwCreateWindow(width, height, "11tesselation", 0, 0)) == 0) {
         std::cerr << "failed to open window" << std::endl;
         glfwTerminate();
         return 1;

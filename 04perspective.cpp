@@ -5,13 +5,6 @@
  * Autor: Jakob Progsch
  */
 
-/* index
- * line  110: matrix uniform in shader
- * line  116: matrix transform in shader
- * line  287: projection matrix creation
- * line  301: draw call        
- */
-
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 
@@ -71,7 +64,7 @@ int main() {
  
     // create a window
     GLFWwindow *window;
-    if((window = glfwCreateWindow(width, height, "00skeleton", 0, 0)) == 0) {
+    if((window = glfwCreateWindow(width, height, "04perspective", 0, 0)) == 0) {
         std::cerr << "failed to open window" << std::endl;
         glfwTerminate();
         return 1;

@@ -11,19 +11,6 @@
  * Autor: Jakob Progsch
  */
 
-/* index
- * line  153: chunk draw shader
- * line  219: occlusion query shader
- * line  273: chunk generation
- * line  494: timer query setup
- * line  523: input handling        
- * line  594: beginning of drawing
- * line  606: start timer query        
- * line  612: occlusion queries
- * line  643: actual rendering            
- * line  674: end timer query and handle results
- */
-
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 
@@ -111,7 +98,7 @@ int main() {
  
     // create a window
     GLFWwindow *window;
-    if((window = glfwCreateWindow(width, height, "00skeleton", 0, 0)) == 0) {
+    if((window = glfwCreateWindow(width, height, "10queries_conditional_render", 0, 0)) == 0) {
         std::cerr << "failed to open window" << std::endl;
         glfwTerminate();
         return 1;
@@ -532,7 +519,7 @@ int main() {
         space_down = glfwGetKey(window, GLFW_KEY_SPACE);
 
         // calculate ViewProjection matrix
-        glm::mat4 Projection = glm::perspective(90.0f, 4.0f / 3.0f, 0.1f, 200.f);
+        glm::mat4 Projection = glm::perspective(60.0f, 4.0f / 3.0f, 0.1f, 200.f);
         glm::mat4 View = rotation*glm::translate(glm::mat4(1.0f), -position);
         glm::mat4 ViewProjection = Projection*View;
 

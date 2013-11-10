@@ -5,13 +5,6 @@
  * Autor: Jakob Progsch
  */
 
-/* index
- * line   24: glfw initialization
- * line   44: gl3w initialization
- * line   54: main loop
- * line   69: cleanup
- */
-
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 

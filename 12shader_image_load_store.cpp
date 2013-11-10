@@ -7,12 +7,6 @@
  * Autor: Jakob Progsch
  */
 
-/* index
- * line  110: shader source code    
- * line  288: texture creation
- * line  338: bind texture as image
- */
-
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 
@@ -70,7 +64,7 @@ int main() {
  
     // create a window
     GLFWwindow *window;
-    if((window = glfwCreateWindow(width, height, "00skeleton", 0, 0)) == 0) {
+    if((window = glfwCreateWindow(width, height, "12shader_image_load_store", 0, 0)) == 0) {
         std::cerr << "failed to open window" << std::endl;
         glfwTerminate();
         return 1;
@@ -140,7 +134,7 @@ int main() {
         
         // add source at image center
         "   if(coords.x == image_size.x/2 && coords.y == image_size.y/2) {\n"
-        "   	HE.z += 30*sin(15*t)*exp(-10*(t-2)*(t-2));\n"
+        "   	HE.z += 30*sin(15*t)*exp(-20*(t-2)*(t-2));\n"
         "	}\n"
         
         "   imageStore(image, coords, HE);\n"
@@ -282,7 +276,7 @@ int main() {
             image[4*index + 0] = 0.0f;
             image[4*index + 1] = 0.0f;
             image[4*index + 2] = 0.0f;
-            image[4*index + 3] = 20.0f*glm::clamp(glm::perlin(0.008f*glm::vec2(i,j+70)),0.0f,0.1f);
+            image[4*index + 3] = 20.0f*glm::clamp(glm::perlin(0.006f*glm::vec2(i,j+150)),0.0f,0.1f);
         }
     }
     
@@ -303,7 +297,7 @@ int main() {
         t += dt;
         
         // reset time every 10 seconds to repeat the sequence
-        if(t>10) t -= 10;
+        if(t>20) t = 0;
 
         // clear first
         glClear(GL_COLOR_BUFFER_BIT);

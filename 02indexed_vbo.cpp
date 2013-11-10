@@ -5,11 +5,6 @@
  * Autor: Jakob Progsch
  */
 
-/* index
- * line  192: index buffer creation    
- * line  225: draw call       
- */
-
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 
@@ -63,7 +58,7 @@ int main() {
  
     // create a window
     GLFWwindow *window;
-    if((window = glfwCreateWindow(width, height, "00skeleton", 0, 0)) == 0) {
+    if((window = glfwCreateWindow(width, height, "02indexed_vbo", 0, 0)) == 0) {
         std::cerr << "failed to open window" << std::endl;
         glfwTerminate();
         return 1;

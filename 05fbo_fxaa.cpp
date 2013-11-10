@@ -6,16 +6,6 @@
  * Autor: Jakob Progsch
  */
 
-/* index
- * line  272: fxaa shader
- * line  580: target texture setup    
- * line  599: render buffer setup
- * line  608: fbo setup 
- * line  645: fbo binding
- * line  672: scene draw call       
- * line  697: post processing draw call           
- */
-
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
 
@@ -74,7 +64,7 @@ int main() {
  
     // create a window
     GLFWwindow *window;
-    if((window = glfwCreateWindow(width, height, "00skeleton", 0, 0)) == 0) {
+    if((window = glfwCreateWindow(width, height, "05fbo_fxaa", 0, 0)) == 0) {
         std::cerr << "failed to open window" << std::endl;
         glfwTerminate();
         return 1;

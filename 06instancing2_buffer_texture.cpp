@@ -8,13 +8,6 @@
  * Autor: Jakob Progsch
  */
  
-/* index
- * line  119: buffer texture access in shader
- * line  273: buffer texture setup    
- * line  337: buffer texture binding       
- * line  353: draw call       
- */
- 
 #include <GL/gl3w.h>
 #include <GLFW/glfw3.h>
  
@@ -74,7 +67,7 @@ int main() {
  
     // create a window
     GLFWwindow *window;
-    if((window = glfwCreateWindow(width, height, "00skeleton", 0, 0)) == 0) {
+    if((window = glfwCreateWindow(width, height, "06instancing2_buffer_texture", 0, 0)) == 0) {
         std::cerr << "failed to open window" << std::endl;
         glfwTerminate();
         return 1;
