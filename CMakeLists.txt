@@ -11,6 +11,7 @@ add_subdirectory(glfw)
 add_subdirectory(glxw)
 
 include_directories(glfw/include)
+include_directories(glm)
 include_directories(${CMAKE_BINARY_DIR}/glxw/include)
  
 set(CMAKE_CXX_FLAGS "-O2 -Wall -Wextra")
