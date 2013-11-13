@@ -5,7 +5,7 @@
  * Autor: Jakob Progsch
  */
 
-#include <GL/gl3w.h>
+#include <GLXW/glxw.h>
 #include <GLFW/glfw3.h>
 
 #include <iostream>
@@ -66,7 +66,7 @@ int main() {
     
     glfwMakeContextCurrent(window);
 
-    if(gl3wInit()) {
+    if(glxwInit()) {
         std::cerr << "failed to init GL3W" << std::endl;
         glfwDestroyWindow(window);
         glfwTerminate();

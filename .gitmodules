@@ -1,3 +1,6 @@
 [submodule "glfw"]
 	path = glfw
 	url = https://github.com/glfw/glfw
+[submodule "glxw"]
+	path = glxw
+	url = https://github.com/rikusalminen/glxw

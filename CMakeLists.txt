@@ -8,13 +8,13 @@ mark_as_advanced(BUILD_OGL43)
 find_package(OpenGL REQUIRED)
 
 add_subdirectory(glfw)
+add_subdirectory(glxw)
 
 include_directories(glfw/include)
+include_directories(${CMAKE_BINARY_DIR}/glxw/include)
  
-set(GL3W_LIBRARY "-lgl3w") 
-
 set(CMAKE_CXX_FLAGS "-O2 -Wall -Wextra")
-SET(LIBRARIES glfw ${GLFW_LIBRARIES} ${GL3W_LIBRARY} ${OPENGL_LIBRARY})
+SET(LIBRARIES glfw glxw ${GLFW_LIBRARIES} ${GLXW_LIBRARY} ${OPENGL_LIBRARY})
 
 link_directories (${OPENGLEXAMPLES_BINARY_DIR}/bin)
  
