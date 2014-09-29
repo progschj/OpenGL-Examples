@@ -365,7 +365,8 @@ int main() {
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4*sizeof(GLfloat), (char*)0 + 0*sizeof(GLfloat));
 
-    glBindBuffersBase(GL_SHADER_STORAGE_BUFFER, 0, 2, (const GLuint[]){positions_vbo, velocities_vbo});
+	const GLuint ssbos[] = {positions_vbo, velocities_vbo};
+    glBindBuffersBase(GL_SHADER_STORAGE_BUFFER, 0, 2, ssbos);
 
     // physical parameters
     float dt = 1.0f/60.0f;
