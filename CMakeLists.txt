@@ -15,7 +15,7 @@ include_directories(glm)
 include_directories(${CMAKE_BINARY_DIR}/glxw/include)
  
 set(CMAKE_CXX_FLAGS "-O2 -Wall -Wextra")
-SET(LIBRARIES glfw glxw ${GLFW_LIBRARIES} ${GLXW_LIBRARY} ${OPENGL_LIBRARY})
+SET(LIBRARIES glfw glxw ${GLFW_LIBRARIES} ${GLXW_LIBRARY} ${OPENGL_LIBRARY} ${CMAKE_DL_LIBS})
 
 link_directories (${OPENGLEXAMPLES_BINARY_DIR}/bin)
  
