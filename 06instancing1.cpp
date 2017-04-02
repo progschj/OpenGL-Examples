@@ -297,7 +297,7 @@ int main() {
 
         // draw
         // the additional parameter indicates how many instances to render
-        glDrawElementsInstanced(GL_TRIANGLES, 6*6, GL_UNSIGNED_INT, 0, 8);
+        glDrawElementsInstanced(GL_TRIANGLES, 2*3*6, GL_UNSIGNED_INT, 0, 8);
        
         // check for errors
         GLenum error = glGetError();
