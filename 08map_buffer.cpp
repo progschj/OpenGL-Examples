@@ -198,7 +198,7 @@ int main() {
     }
 
     
-    int buffercount = 3;
+    const int buffercount = 3;
     // generate vbos and vaos
     GLuint vao[buffercount], vbo[buffercount];
     glGenVertexArrays(buffercount, vao);

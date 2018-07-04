@@ -278,7 +278,7 @@ int main() {
         vertexData[2*i+1] = glm::vec3(0,0,0);
     }
     
-    int buffercount = 2;
+    const int buffercount = 2;
     // generate vbos and vaos
     GLuint vao[buffercount], vbo[buffercount];
     glGenVertexArrays(buffercount, vao);
