@@ -121,7 +121,7 @@ int main() {
         "layout(location = 0) out vec4 FragColor;\n"
         "void main() {\n"
         "   float s = 0.2*(1/(1+15.*dot(txcoord, txcoord))-1/16.);\n"
-        "   FragColor = s*vec4(1,0.9,0.6,1);\n"
+        "   FragColor = s*vec4(0.925f, 0.69f, 0.208f, 1.0f);\n"
         "}\n";
    
     // program and shader handles
