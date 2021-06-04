@@ -80,6 +80,13 @@ int main() {
     
     glfwMakeContextCurrent(window);
 
+    // Bind ESC key press to close the application
+    glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+        if (action == GLFW_PRESS and key == GLFW_KEY_ESCAPE) {
+            glfwSetWindowShouldClose(window, true);
+        };
+    });
+
     if(glxwInit()) {
         std::cerr << "failed to init GL3W" << std::endl;
         glfwDestroyWindow(window);
