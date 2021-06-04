@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 2.6)
   
 project(OPENGLEXAMPLES)
 
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
 option(BUILD_OGL43 "Bild OpenGL 4.3 examples" OFF)
 mark_as_advanced(BUILD_OGL43)
 
